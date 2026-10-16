@@ -1,0 +1,7 @@
+node_modules
+dist
+release
+installer
+win-unpacked.tmp
+*.log
+.DS_Store

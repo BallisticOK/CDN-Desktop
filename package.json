@@ -1,0 +1,73 @@
+{
+  "name": "cdn-desktop",
+  "productName": "CDN Desktop",
+  "version": "1.0.0",
+  "description": "Desktop client for self-hosted CDN Platform servers",
+  "author": "dvsprism",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BallisticOK/CDN-Desktop.git"
+  },
+  "homepage": "https://github.com/BallisticOK/CDN-Desktop",
+  "main": "electron/main.cjs",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n vite,electron \"vite\" \"wait-on tcp:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 node scripts/electron.cjs .\"",
+    "build": "vite build",
+    "start": "vite build && node scripts/electron.cjs .",
+    "icon": "node scripts/electron.cjs scripts/make-icon.cjs",
+    "dist": "vite build && electron-builder --win"
+  },
+  "build": {
+    "appId": "xyz.0x00sec.cdndesktop",
+    "productName": "CDN Desktop",
+    "files": [
+      "dist/**",
+      "electron/**",
+      "package.json"
+    ],
+    "directories": {
+      "output": "installer"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
+    }
+  },
+  "dependencies": {
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/language-data": "^6.5.2",
+    "@codemirror/theme-one-dark": "^6.1.3",
+    "@codemirror/view": "^6.43.14",
+    "@uiw/react-codemirror": "^4.25.12",
+    "lucide-react": "^1.58.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.6",
+    "cross-env": "^10.1.0",
+    "electron": "^44.8.0",
+    "electron-builder": "^26.15.3",
+    "vite": "^8.3.4",
+    "wait-on": "^9.5.1"
+  },
+  "allowScripts": {
+    "electron@44.8.0": true,
+    "electron-winstaller@5.4.0": true
+  }
+}
