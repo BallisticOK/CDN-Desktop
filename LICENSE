@@ -1,75 +1,793 @@
-CDN Desktop — Source-Available License (Written Permission Required)
+CACHE NETWORKS AND BALLISTICOK SOURCE-AVAILABLE PERSONAL & COMMUNITY CONTRIBUTION LICENSE
+Version 2.0 — 17 October 2026
 
-Copyright (c) 2026 BallisticOK (https://github.com/BallisticOK) and
-cachenetworks (https://github.com/cachenetworks). All rights reserved.
+Copyright (c) 2026 Cache Networks (cachenetworks) and BallisticOK.
+All rights reserved except those expressly granted by this License.
 
-The source code of CDN Desktop (the "Software") is owned jointly by
-BallisticOK and cachenetworks (together the "Owners", each an "Owner"). It is
-published publicly so that anyone can read and review it. Being public does
-NOT make it open source, and no open-source licence applies to it.
+IMPORTANT NOTICE
 
-1. What you MAY do without asking
-   a. View and read the source code on GitHub.
-   b. Download the official, unmodified release builds published by the
-      Owners at https://github.com/BallisticOK/CDN-Desktop/releases and run
-      them for your own personal, non-commercial use.
-   c. Open issues and suggest changes (pull requests) to the official
-      repository. By submitting a contribution you grant the Owners a
-      perpetual, irrevocable, worldwide, royalty-free right to use, modify
-      and relicense it.
+This is a custom source-available license. It is NOT an OSI-approved open-source
+license, is NOT a free-software license, and does not grant the unrestricted
+rights normally associated with licenses such as MIT, Apache-2.0, BSD, GPL,
+AGPL, MPL, or similar licenses.
 
-2. What is PROHIBITED without written permission
-   Unless you hold written permission from at least one Owner, you may NOT:
-   a. Use any part of the source code, assets, design or documentation in
-      any other project, product, service or codebase, whether free or paid,
-      public or private, personal or commercial.
-   b. Copy the source code, in whole or in part, including copying snippets,
-      files, functions or substantial portions of its structure.
-   c. Fork the repository for your own use. A fork created only through
-      GitHub's interface, as GitHub's Terms of Service allow, may be used
-      solely to view the code and to submit pull requests to the official
-      repository. It may not be built, modified for your own purposes,
-      used, redistributed or kept as the basis of another project.
-   d. Modify, translate, adapt or create derivative works of the Software.
-   e. Build, compile or package your own copies of the Software.
-   f. Redistribute, re-upload, mirror, sell, sublicense, rent or host the
-      Software, its source code or the official builds.
-   g. Remove or alter any copyright, licence or attribution notice.
-   h. Use the Software or its code for any commercial purpose.
+The Software is made publicly viewable so people can inspect it, learn how the
+project works, use it privately, and contribute improvements back to CDN Desktop.
+Public availability of the source code does not place the Software in the
+public domain and does not grant a general right to redistribute, repackage,
+rebrand, resell, host, mirror, sublicense, or create a competing product.
 
-3. How to get permission
-   Ask either Owner, for example by opening an issue at
-   https://github.com/BallisticOK/CDN-Desktop/issues or by contacting
-   https://github.com/BallisticOK or https://github.com/cachenetworks.
-   Permission exists only if an Owner grants it explicitly, in writing, to
-   you personally. Silence, inaction or the code being public is not
-   permission. Any permission is limited to the scope stated in writing, is
-   non-transferable, and may be revoked by either Owner at any time.
+By exercising any permission granted by this License, including downloading,
+using, copying, modifying, forking, or contributing to the Software, you accept
+and agree to comply with this License.
 
-4. Ownership
-   The Owners retain all right, title and interest in the Software. No
-   rights are granted except those expressly stated above. Either Owner may
-   enforce this licence on behalf of both.
+-------------------------------------------------------------------------------
+1. DEFINITIONS
+-------------------------------------------------------------------------------
 
-5. Enforcement
-   Any use, copying, forking or distribution outside these terms is
-   copyright infringement. The Owners will act on it and may, without
-   further notice:
-   a. file DMCA or equivalent takedown notices against infringing copies,
-      repositories, packages and hosted builds;
-   b. take legal action and seek damages, legal costs, injunctions and any
-      other remedy available under applicable law.
-   Any permission previously granted to an infringing party terminates
-   immediately and automatically.
+1.1 "Owners" means Cache Networks (https://github.com/cachenetworks)
+and BallisticOK (https://github.com/BallisticOK), the joint copyright
+holders who publish CDN Desktop, together with their lawful successors.
+Each copyright holder is an "Owner". Either Owner may give written permission
+under this License unless applicable law requires both Owners to consent.
 
-6. Third-party components
-   The Software includes third-party open-source components that remain
-   subject to their own licences. This licence does not restrict rights
-   granted by those licences for those components alone.
+1.2 "CDN Desktop" means the software project distributed from the official
+repository currently located at:
 
-7. No warranty
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL
-   THE OWNERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING
-   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
+    https://github.com/BallisticOK/CDN-Desktop
+
+and any official successor repository designated by the Owners.
+
+1.3 "Software" means all copyrightable material made available as part of
+CDN Desktop by the Owners, including source code, scripts, configuration,
+database schemas, migrations, build files, Docker files, user-interface code,
+documentation, examples, tests, templates, project-specific assets, and other
+repository content, except Third-Party Material as defined below.
+
+1.4 "Official Repository" means the CDN Desktop repository maintained at
+the URL in Section 1.2 and any official successor repository designated
+by the Owners.
+
+1.5 "You" or "Your" means the individual or legal person exercising rights
+under this License.
+
+1.6 "Personal Use" means use by a natural person primarily for private,
+non-commercial purposes and not on behalf of a business, employer, customer,
+client, commercial operation, paid community, organisation, or other third
+party.
+
+1.7 "Commercial Use" means use primarily intended for commercial advantage,
+financial compensation, revenue generation, cost recovery from third parties,
+business operations, resale, paid hosting, paid support, paid access,
+subscription services, advertising-supported services, or another activity
+connected with trade or commerce.
+
+1.8 "Organisational Use" means use by or for a company, partnership,
+association, incorporated or unincorporated organisation, government body,
+educational institution, club, paid community, employer, client, customer, or
+other group, whether or not the organisation is operated for profit.
+
+1.9 "Community Fork" means a GitHub fork of the Official Repository maintained
+primarily for bona fide contribution, review, testing, issue reproduction,
+discussion, or development work intended to benefit CDN Desktop or assist the
+CDN Desktop community.
+
+1.10 "Modification" means any alteration, adaptation, translation, port,
+refactor, extension, deletion, rearrangement, or other change to the Software.
+
+1.11 "Derivative Work" means a work based upon or incorporating copyrightable
+expression from the Software to the extent recognised by applicable law.
+
+1.12 "Covered Excerpt" means source code or other copyrightable expression
+copied or adapted from the Software, including one or more non-trivial lines,
+functions, classes, components, schemas, configuration blocks, documentation
+passages, or other identifiable expression. A purely functional idea, fact,
+algorithmic concept, public API concept, short name, or independently created
+expression is not automatically a Covered Excerpt merely because it resembles
+the Software.
+
+1.13 "Redistribution" means making the Software, a Modification, a Derivative
+Work, or a substantial or identifiable portion of it available to another
+person by any means, including publication, release, upload, mirror,
+repository, archive, package registry, container registry, download site,
+bundle, binary distribution, source distribution, or transfer.
+
+1.14 "Hosted Service" means making the Software or a Modification available for
+third-party use over a network, including software-as-a-service (SaaS),
+platform-as-a-service, managed hosting, managed CDN services, hosted control
+panels, hosted APIs, commercial demonstrations, or other remotely accessible
+services.
+
+1.15 "Contribution" means code, documentation, tests, designs, patches,
+configuration, examples, or other copyrightable material intentionally
+submitted to the Owners for possible inclusion in CDN Desktop.
+
+1.16 "Third-Party Material" means material included in, used by, linked from, or
+distributed with the Software that is owned by someone other than the Owners and is governed by a separate license or terms.
+
+-------------------------------------------------------------------------------
+2. OWNERSHIP AND RESERVATION OF RIGHTS
+-------------------------------------------------------------------------------
+
+2.1 The Software is licensed, not sold.
+
+2.2 Except for Third-Party Material and copyright in original Contributions
+owned by their respective contributors, the Owners retain all right,
+title, and interest in and to the Software, including all copyright and other
+intellectual-property rights.
+
+2.3 No rights are granted by implication, estoppel, exhaustion beyond what
+applicable law requires, or otherwise. All rights not expressly granted by this
+License are reserved.
+
+2.4 Making source code publicly accessible does not waive copyright, dedicate
+the Software to the public domain, or create an unrestricted permission to copy
+or redistribute it.
+
+-------------------------------------------------------------------------------
+3. LIMITED PERSONAL-USE LICENSE GRANT
+-------------------------------------------------------------------------------
+
+Subject to Your continuing compliance with this License, the Owners grant
+You a limited, revocable, non-exclusive, non-transferable, non-sublicensable,
+royalty-free license to:
+
+a. view and inspect the Software;
+b. download the Software;
+c. run the Software for Personal Use;
+d. privately modify the Software for Personal Use;
+e. create reasonable private backups for permitted use;
+f. study the Software for educational and technical understanding; and
+g. perform private testing, debugging, benchmarking, and evaluation.
+
+This Section does not authorise Commercial Use, Organisational Use,
+Redistribution, rebranding, sublicensing, or operation of a Hosted Service.
+
+-------------------------------------------------------------------------------
+4. COMMUNITY FORKS EXPRESSLY PERMITTED
+-------------------------------------------------------------------------------
+
+4.1 The Owners expressly permit Community Forks on GitHub for genuine
+community-development purposes.
+
+4.2 Permitted Community Fork activities include:
+
+a. preparing bug fixes;
+b. preparing features and enhancements;
+c. refactoring code;
+d. improving performance or reliability;
+e. adding or improving tests;
+f. improving documentation;
+g. reproducing bugs;
+h. investigating reported issues;
+i. conducting code review;
+j. demonstrating proposed changes;
+k. collaborating with other CDN Desktop contributors;
+l. submitting pull requests;
+m. maintaining an in-progress branch for a proposed contribution; and
+n. other good-faith development activity intended to improve CDN Desktop.
+
+4.3 A Community Fork may be public where GitHub's normal fork workflow makes
+the fork public.
+
+4.4 Every Community Fork must:
+
+a. remain linked to or clearly identify the Official Repository as its origin;
+b. retain this LICENSE file in full;
+c. retain existing copyright and attribution notices;
+d. clearly state that it is an unofficial development fork if there is any
+   reasonable possibility of confusion;
+e. avoid branding that suggests endorsement or official status unless either Owner has given written permission;
+f. be used primarily for contribution, review, testing, discussion, or related
+   community-development purposes; and
+g. comply with every other restriction in this License.
+
+4.5 A Community Fork must NOT be used to:
+
+a. launch an independent CDN Desktop distribution;
+b. publish independent releases for end users;
+c. operate a competing project;
+d. create a rebranded CDN Desktop product;
+e. sell or monetise CDN Desktop;
+f. operate a Hosted Service for third parties;
+g. publish prebuilt binaries, packages, or container images as an independent
+   distribution;
+h. create a general-purpose mirror or alternative download source;
+i. remove or weaken this License; or
+j. evade any restriction of this License.
+
+4.6 The Community Fork permission is an exception to the general
+Redistribution restriction only to the minimum extent reasonably necessary for
+GitHub-based contribution and community review.
+
+-------------------------------------------------------------------------------
+5. CONTRIBUTIONS TO CDN DESKTOP
+-------------------------------------------------------------------------------
+
+5.1 You may submit Contributions to the Owners through pull requests,
+patches, issues, discussions, or another contribution channel accepted by
+the Owners.
+
+5.2 By intentionally submitting a Contribution, You represent and warrant that:
+
+a. You created the Contribution or otherwise have sufficient rights to submit
+   it under these terms;
+b. Your Contribution does not knowingly infringe another person's copyright,
+   patent, trademark, trade secret, confidentiality obligation, or other right;
+c. You are not knowingly submitting code that You are prohibited from
+   contributing by an employer, client, contract, NDA, or other obligation;
+d. any Third-Party Material included in the Contribution is clearly identified
+   and compatible with its proposed use in CDN Desktop; and
+e. You have disclosed any license notice that must remain with the Contribution.
+
+5.3 You retain copyright ownership in Your original Contribution unless You
+separately assign that ownership in writing.
+
+5.4 By submitting a Contribution for possible inclusion in CDN Desktop, You grant
+the Owners a perpetual, worldwide, irrevocable, non-exclusive,
+transferable, sublicensable, royalty-free license to:
+
+a. use;
+b. reproduce;
+c. modify;
+d. adapt;
+e. translate;
+f. create derivative works from;
+g. publish;
+h. publicly display;
+i. publicly perform;
+j. distribute;
+k. make available;
+l. sublicense;
+m. relicense; and
+n. otherwise exploit
+
+the Contribution, in whole or in part, in connection with CDN Desktop and related
+the Owners' projects, products, releases, documentation, hosted offerings,
+services, commercial offerings, or successor works.
+
+5.5 The contribution grant in Section 5.4 is intentionally broad so the Owners can continue maintaining, distributing, licensing, commercialising,
+or relicensing CDN Desktop in the future without obtaining separate permission
+for every release.
+
+5.6 Submitting a Contribution does not guarantee that it will be accepted,
+merged, credited in a particular format, maintained indefinitely, or included
+in any release.
+
+-------------------------------------------------------------------------------
+6. ATTRIBUTION FOR COPIED OR DERIVED CODE
+-------------------------------------------------------------------------------
+
+6.1 If You copy or adapt a Covered Excerpt into another project under any
+permission granted by either Owner, You must preserve attribution.
+
+6.2 At minimum, the relevant source file or an accompanying attribution file
+must contain a notice substantially equivalent to:
+
+    Contains code derived from CDN Desktop by Cache Networks and BallisticOK.
+    Original project: https://github.com/BallisticOK/CDN-Desktop
+    Licensed under Cache Networks and BallisticOK Source-Available Personal &
+    Community Contribution License.
+
+6.3 Existing copyright, license, and authorship notices in copied material must
+not be removed, obscured, falsified, or replaced.
+
+6.4 If a Covered Excerpt is copied into multiple files, attribution may be
+provided in each relevant file or in a clearly discoverable NOTICE or
+ATTRIBUTION file that identifies the affected material.
+
+6.5 Attribution is required for copied or adapted copyrightable expression even
+where the Covered Excerpt is modified, renamed, reformatted, translated to
+another programming language, reorganised, or combined with other code.
+
+6.6 Attribution does NOT itself grant permission to Redistribute or use the
+Software commercially. Attribution and permission are separate requirements.
+
+6.7 Nothing in this License claims ownership over independently created code,
+ideas, facts, algorithms, methods, interfaces, or material that applicable law
+does not protect as the Owners' copyright.
+
+-------------------------------------------------------------------------------
+7. GENERAL PROHIBITION ON REDISTRIBUTION
+-------------------------------------------------------------------------------
+
+Except for Community Fork activity expressly permitted by Section 4, or
+separate written permission from either Owner, You may not Redistribute the
+Software.
+
+Without limitation, You may not:
+
+a. publish the Software in another repository;
+b. mirror the Official Repository outside the permitted Community Fork model;
+c. upload copies to file-sharing or download sites;
+d. publish source archives;
+e. publish modified source archives;
+f. publish binaries or installers;
+g. publish Docker or OCI images;
+h. publish packages to npm, PyPI, crates.io, NuGet, Maven, package managers, or
+   similar registries;
+i. bundle the Software into another distributed product;
+j. distribute a white-label or rebranded version;
+k. provide the Software to customers or clients;
+l. sublicense the Software;
+m. sell copies of the Software;
+n. distribute the Software as part of paid support, consulting, or hosting;
+o. provide an independent update channel; or
+p. use a Community Fork as a disguised independent distribution.
+
+-------------------------------------------------------------------------------
+8. NO COMMERCIAL USE WITHOUT WRITTEN PERMISSION
+-------------------------------------------------------------------------------
+
+8.1 Commercial Use is prohibited unless either Owner gives prior written
+permission or provides a separate commercial license.
+
+8.2 Prohibited Commercial Use includes, without limitation:
+
+a. selling access to the Software;
+b. charging setup or license fees for the Software;
+c. charging customers to host or operate the Software;
+d. using the Software to provide a paid CDN, storage, file-delivery, or hosting
+   service;
+e. reselling the Software;
+f. incorporating the Software into a commercial product offered to customers;
+g. monetising a rebranded or modified version;
+h. operating an advertising-supported public service based primarily on the
+   Software;
+i. using the Software as a material part of a revenue-generating managed
+   service; or
+j. offering paid access to a Hosted Service powered by the Software.
+
+8.3 Incidental use of ordinary developer tools, internet service, cloud
+resources, or hardware that cost money does not by itself convert otherwise
+permitted Personal Use into Commercial Use.
+
+-------------------------------------------------------------------------------
+9. NO ORGANISATIONAL USE WITHOUT WRITTEN PERMISSION
+-------------------------------------------------------------------------------
+
+9.1 Organisational Use is prohibited unless either Owner gives prior written
+permission or provides a separate license.
+
+9.2 Examples include deployment by or for:
+
+a. companies;
+b. employers;
+c. customers or clients;
+d. incorporated associations;
+e. government organisations;
+f. schools or universities;
+g. clubs or communities operating a shared production service;
+h. non-profit organisations;
+i. hosting providers; or
+j. managed-service providers.
+
+9.3 An individual may still use an employer-owned or organisation-owned
+computer solely to prepare a Community Fork contribution where that use is
+lawful, authorised by the owner of the computer, and not itself an
+Organisational deployment of CDN Desktop.
+
+-------------------------------------------------------------------------------
+10. HOSTED SERVICES AND NETWORK ACCESS
+-------------------------------------------------------------------------------
+
+10.1 You may run CDN Desktop for Personal Use to connect to and manage
+CDN servers, storage, files, API keys, and related services that You own or
+are personally authorised to use for non-commercial purposes.
+
+10.2 The fact that a personal, non-commercial CDN server managed through
+CDN Desktop delivers Your files to public visitors does not, by itself,
+constitute a prohibited Hosted Service. This exception does not allow You
+to provide CDN Desktop itself or a paid or organisational CDN-management
+service to third parties.
+
+10.3 You may not offer CDN Desktop, a Modification, or a substantially
+similar Derivative Work as a Hosted Service for third parties without
+written permission from either Owner.
+
+10.4 Prohibited Hosted Service activity includes offering third-party
+accounts, remote access to the Software, white-label CDN management,
+file-management services, managed storage, shared administration, or any
+comparable service built from the Software.
+
+10.5 A temporary development deployment reasonably necessary to demonstrate
+a Contribution to the Owners is permitted where access is limited to project
+reviewers and the deployment is not marketed, monetised, or operated as an
+independent service.
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+11. MODIFICATIONS AND PRIVATE DERIVATIVE WORKS
+-------------------------------------------------------------------------------
+
+11.1 You may create Modifications for Personal Use.
+
+11.2 You may keep private branches or private copies containing Modifications.
+
+11.3 You may not publish or Redistribute a Modification except through a
+permitted Community Fork workflow or with written permission.
+
+11.4 A Modification remains subject to this License to the extent it contains
+or derives from the Software.
+
+11.5 Rewriting, porting, translating, reorganising, or refactoring copied
+copyrightable expression does not remove the attribution or licensing
+obligations merely because the result looks different.
+
+11.6 Independent implementations created without copying protected expression
+are not automatically governed by this License merely because they implement
+similar functionality.
+
+-------------------------------------------------------------------------------
+12. BINARIES, CONTAINERS, PACKAGES, BUILDS, AND RELEASE ARTIFACTS
+-------------------------------------------------------------------------------
+
+12.1 You may privately build binaries, bundles, packages, or container images
+for permitted Personal Use or contribution testing.
+
+12.2 You may not publicly publish or Redistribute those artifacts except where
+either Owner has given written permission.
+
+12.3 Official binaries, packages, releases, containers, and deployment images
+published by the Owners remain governed by this License unless a different
+license is expressly attached to the specific artifact.
+
+-------------------------------------------------------------------------------
+13. COPYING INTO OTHER PROJECTS
+-------------------------------------------------------------------------------
+
+13.1 You may not use CDN Desktop as a source-code library for another distributed
+project unless the Owners grant written permission.
+
+13.2 Where written permission allows a Covered Excerpt to be used in another
+project, the attribution requirements in Section 6 apply unless the written
+permission expressly says otherwise.
+
+13.3 Copying a Covered Excerpt and then making cosmetic edits, renaming
+variables, changing formatting, changing language syntax, or splitting the
+code across files does not eliminate the attribution obligation.
+
+13.4 This License does not prohibit independent development or prohibit use of
+general knowledge gained from reading the Software where no protected
+expression is copied.
+
+-------------------------------------------------------------------------------
+14. NO RELICENSING BY LICENSEES
+-------------------------------------------------------------------------------
+
+14.1 Except for the Owners exercising rights granted under Section 5, You
+may not relicense the Software or any Covered Excerpt.
+
+14.2 You may not attach MIT, Apache, GPL, AGPL, BSD, MPL, proprietary, public
+domain, Creative Commons, or any other terms to the Owners' code in a way
+that purports to replace, override, or weaken this License.
+
+14.3 You may license code that You independently create under terms of Your
+choice, provided that doing so does not purport to grant rights in the Owners' material that You do not possess.
+
+-------------------------------------------------------------------------------
+15. BRANDING, NAMES, LOGOS, AND TRADEMARKS
+-------------------------------------------------------------------------------
+
+15.1 This License does not grant any right to use the names "Cache Networks",
+"BallisticOK", "CDN Desktop", associated logos, visual identity, domain names, or other branding
+as a trademark, service mark, business name, product identity, or endorsement.
+
+15.2 A Community Fork may use the name "CDN Desktop" only as reasonably necessary
+to identify its upstream origin, for example:
+
+    "Unofficial fork of CDN Desktop by the Owners"
+
+15.3 You may not imply sponsorship, endorsement, partnership, certification, or
+official status without written permission.
+
+-------------------------------------------------------------------------------
+16. SECURITY RESEARCH
+-------------------------------------------------------------------------------
+
+16.1 This License does not prohibit good-faith review of the Software for
+security vulnerabilities.
+
+16.2 Security findings should be reported responsibly to the Owners rather
+than weaponised through a misleading fork or redistributed malicious build.
+
+16.3 This Section grants no permission to attack, access, disrupt, or test
+systems You do not own or have explicit authorisation to test.
+
+-------------------------------------------------------------------------------
+17. THIRD-PARTY MATERIAL AND DEPENDENCIES
+-------------------------------------------------------------------------------
+
+17.1 Third-Party Material is governed by its own applicable license or terms.
+
+17.2 Nothing in this License reduces, replaces, or expands rights independently
+granted by a third-party license.
+
+17.3 Where the repository contains a dependency merely referenced through a
+package manager, that dependency does not become subject to this License solely
+because CDN Desktop depends on it.
+
+17.4 You remain responsible for complying with all applicable third-party
+licenses when building or using the Software.
+
+-------------------------------------------------------------------------------
+18. GITHUB AND PLATFORM-SPECIFIC RIGHTS
+-------------------------------------------------------------------------------
+
+18.1 The Official Repository is hosted on GitHub. GitHub's own Terms of Service
+may grant platform-specific rights necessary for users to view and fork public
+repositories through GitHub's functionality.
+
+18.2 Nothing in this License is intended to revoke rights that GitHub itself
+must provide under its Terms of Service for operation of the GitHub platform.
+
+18.3 Any platform-specific right granted by GitHub does not create a broader
+license from the Owners to:
+
+a. commercialise the Software;
+b. relicense the Software;
+c. create an independent distribution;
+d. operate a Hosted Service;
+e. remove attribution; or
+f. use the Owners' branding.
+
+18.4 If another hosting platform provides similar technical fork functionality,
+that functionality does not create rights beyond those expressly granted by
+this License.
+
+-------------------------------------------------------------------------------
+19. COPYRIGHT AND ATTRIBUTION NOTICES
+-------------------------------------------------------------------------------
+
+19.1 You must retain this License with every permitted copy where reasonably
+practicable.
+
+19.2 You must not remove copyright headers or notices from files unless either Owner has expressly authorised their removal.
+
+19.3 You must not add false authorship or ownership claims to the Owners
+material.
+
+19.4 You may accurately identify Your own authorship of Your original
+Contribution or Modification.
+
+-------------------------------------------------------------------------------
+20. NO PATENT, TRADEMARK, OR OTHER IMPLIED LICENSE
+-------------------------------------------------------------------------------
+
+20.1 No patent license is granted except to the minimum extent, if any,
+necessarily implied by applicable law to exercise an express copyright
+permission granted in this License.
+
+20.2 No trademark license is granted.
+
+20.3 No right to confidential information, trade secrets, designs, branding,
+domain names, or publicity rights is granted.
+
+-------------------------------------------------------------------------------
+21. COMPLIANCE WITH LAW
+-------------------------------------------------------------------------------
+
+You may use the Software only in compliance with applicable law and may not use
+the Software in a way that requires the Owners to violate applicable law or
+the rights of another person.
+
+-------------------------------------------------------------------------------
+22. REQUESTING ADDITIONAL PERMISSION
+-------------------------------------------------------------------------------
+
+22.1 Uses not expressly permitted by this License require prior written
+permission from either Owner.
+
+22.2 Either Owner may, at their sole discretion, grant:
+
+a. commercial licenses;
+b. organisational-use licenses;
+c. redistribution permissions;
+d. hosted-service permissions;
+e. OEM or white-label rights;
+f. educational or non-profit exceptions; or
+g. other permissions
+
+under separate terms.
+
+22.3 A separate written permission may waive or modify specific provisions of
+this License only for the person and use stated in that permission.
+
+-------------------------------------------------------------------------------
+23. TERMINATION
+-------------------------------------------------------------------------------
+
+23.1 Your rights under this License terminate automatically if You materially
+breach this License.
+
+23.2 Upon termination, You must cease all use for which this License is
+required and, where legally and technically possible, remove or delete
+unauthorised copies and distributions under Your control.
+
+23.3 The Owners may require You to remove an unauthorised repository,
+package, download, hosted deployment, or other distribution.
+
+23.4 Termination does not affect:
+
+a. rights and remedies arising from a breach before termination;
+b. the Owners' ownership rights;
+c. the Contribution license already granted under Section 5, which is
+   irrevocable; or
+d. provisions that by their nature should survive termination.
+
+23.5 Sections concerning ownership, Contributions, attribution, restrictions,
+disclaimers, liability, and interpretation survive termination to the extent
+applicable.
+
+-------------------------------------------------------------------------------
+24. ENFORCEMENT AND REMEDIES
+-------------------------------------------------------------------------------
+
+24.1 The Owners reserve all remedies available under applicable law for
+copyright infringement, breach of license conditions, passing off, trademark
+misuse, breach of contract where applicable, or other unlawful conduct.
+
+24.2 Failure to enforce a provision on one occasion does not waive the right to
+enforce that provision or another provision later.
+
+24.3 Permission given to one person does not automatically grant the same
+permission to another person.
+
+24.4 A delay in requesting removal of an unauthorised copy does not convert the
+copy into an authorised distribution.
+
+-------------------------------------------------------------------------------
+25. DISCLAIMER OF WARRANTY
+-------------------------------------------------------------------------------
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SOFTWARE IS PROVIDED
+"AS IS" AND "AS AVAILABLE", WITH ALL FAULTS AND WITHOUT WARRANTY OF ANY KIND.
+
+THE OWNERS DISCLAIM ALL EXPRESS, IMPLIED, STATUTORY, AND OTHER WARRANTIES,
+INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+TITLE, QUIET ENJOYMENT, ACCURACY, SECURITY, AVAILABILITY, NON-INFRINGEMENT, AND
+THAT THE SOFTWARE WILL BE ERROR-FREE OR SUITABLE FOR ANY PARTICULAR DEPLOYMENT.
+
+YOU ARE RESPONSIBLE FOR REVIEWING, CONFIGURING, SECURING, BACKING UP, AND
+OPERATING THE SOFTWARE.
+
+-------------------------------------------------------------------------------
+26. LIMITATION OF LIABILITY
+-------------------------------------------------------------------------------
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE OWNERS AND THEIR CONTRIBUTORS WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, PUNITIVE, OR CONSEQUENTIAL DAMAGES, OR FOR LOSS OF DATA, PROFITS,
+REVENUE, GOODWILL, BUSINESS, SECURITY, AVAILABILITY, OR SERVICE, ARISING FROM OR
+RELATING TO THE SOFTWARE OR THIS LICENSE, WHETHER BASED IN CONTRACT, TORT,
+NEGLIGENCE, STRICT LIABILITY, OR ANOTHER THEORY, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+WHERE LIABILITY CANNOT LAWFULLY BE EXCLUDED, IT IS LIMITED TO THE MAXIMUM
+EXTENT PERMITTED BY APPLICABLE LAW.
+
+-------------------------------------------------------------------------------
+27. NO SUPPORT OBLIGATION
+-------------------------------------------------------------------------------
+
+This License does not require the Owners or any contributor to provide
+support, maintenance, updates, security patches, hosting, documentation,
+migration assistance, compatibility, or continued availability of the
+Software.
+
+-------------------------------------------------------------------------------
+28. CHANGES TO FUTURE VERSIONS
+-------------------------------------------------------------------------------
+
+28.1 The Owners may publish future versions of CDN Desktop under a revised
+license.
+
+28.2 A later license version does not retroactively remove permissions already
+granted for a copy that the Owners previously distributed under an earlier
+license, except where applicable law or the earlier license itself provides
+otherwise.
+
+28.3 New releases may state that they are governed by a newer version of this
+License.
+
+-------------------------------------------------------------------------------
+29. SEVERABILITY
+-------------------------------------------------------------------------------
+
+If any provision of this License is held invalid, illegal, or unenforceable,
+that provision will be interpreted or limited to the minimum extent necessary
+to make it enforceable where permitted, and the remaining provisions will
+continue in effect.
+
+-------------------------------------------------------------------------------
+30. NO WAIVER
+-------------------------------------------------------------------------------
+
+No failure or delay by the Owners in exercising a right or remedy operates
+as a waiver of that or any other right or remedy.
+
+-------------------------------------------------------------------------------
+31. ENTIRE LICENSE AND ORDER OF PRECEDENCE
+-------------------------------------------------------------------------------
+
+31.1 This License states the default permissions granted by the Owners for
+the Software.
+
+31.2 If either Owner gives You a separate written license or permission that
+expressly conflicts with this License, the separate written terms control for
+that expressly authorised use.
+
+31.3 Third-Party Material remains controlled by its own applicable terms.
+
+-------------------------------------------------------------------------------
+32. INTERPRETATION
+-------------------------------------------------------------------------------
+
+32.1 Headings are for convenience and do not limit the meaning of a provision.
+
+32.2 "Including" means "including without limitation".
+
+32.3 A reference to written permission includes an electronically signed
+agreement or other written authorisation that can reasonably be authenticated
+as coming from the Owners.
+
+32.4 This License should not be interpreted to claim rights that applicable law
+does not allow the Owners to claim.
+
+-------------------------------------------------------------------------------
+33. QUICK PERMISSION MATRIX
+-------------------------------------------------------------------------------
+
+The following summary is provided for convenience only. If it conflicts with
+the detailed terms above, the detailed terms control.
+
+Activity                                                   Permission
+---------------------------------------------------------  --------------------
+View and inspect source                                    ALLOWED
+Download for personal use                                  ALLOWED
+Run privately for personal, non-commercial use             ALLOWED
+Modify privately for personal use                          ALLOWED
+Create private backups                                     ALLOWED
+Fork on GitHub to help CDN Desktop development                ALLOWED
+Submit pull requests                                       ALLOWED
+Public Community Fork used for contribution work           ALLOWED
+Publish an independent CDN Desktop release                    NOT ALLOWED
+Mirror the repository as a separate download source        NOT ALLOWED
+Publish binaries, packages, or container images            NOT ALLOWED
+Rebrand CDN Desktop as Your own product                       NOT ALLOWED
+Sell CDN Desktop or a modified version                        NOT ALLOWED
+Run CDN Desktop as a paid service                             NOT ALLOWED
+Run CDN Desktop for a business or organisation                NOT ALLOWED
+Copy protected code into another distributed project       PERMISSION REQUIRED
+Copy permitted code without required attribution           NOT ALLOWED
+Claim authorship of the Owners' code                    NOT ALLOWED
+Remove this License from a permitted fork                  NOT ALLOWED
+Use a Community Fork to prepare improvements               ALLOWED
+Use the Owners' branding as Your own                    NOT ALLOWED
+Request a separate commercial/redistribution license       ALLOWED
+
+-------------------------------------------------------------------------------
+34. ATTRIBUTION TEMPLATE
+-------------------------------------------------------------------------------
+
+Where attribution is required by Section 6, the following form is recommended:
+
+    Contains code derived from CDN Desktop by Cache Networks and BallisticOK.
+    Copyright (c) 2026 Cache Networks (cachenetworks) and BallisticOK.
+    Original project: https://github.com/BallisticOK/CDN-Desktop
+    Used under Cache Networks and BallisticOK Source-Available Personal &
+    Community Contribution License.
+
+-------------------------------------------------------------------------------
+35. FINAL STATEMENT
+-------------------------------------------------------------------------------
+
+The purpose of this License is to keep CDN Desktop openly viewable and welcoming
+to community contribution while preventing unauthorised redistribution,
+commercial exploitation, rebranding, hosted resale, and appropriation of the Owners' work.
+
+If You want to improve CDN Desktop, fork it, experiment, submit issues, and send
+pull requests.
+
+If You want to redistribute it, commercialise it, host it for third parties,
+rebrand it, incorporate protected code into another distributed project, or
+obtain broader rights, You must first obtain permission from either Owner.

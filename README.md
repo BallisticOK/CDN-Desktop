@@ -430,14 +430,20 @@ That's what it's built for: add each server with its own URL and key and switch 
 
 ## 📜 License
 
-**Source-available, not open source.** © 2026 [BallisticOK](https://github.com/BallisticOK) & [cachenetworks](https://github.com/cachenetworks). All rights reserved.
+**Source-available, not open source.** © 2026 [Cache Networks (cachenetworks)](https://github.com/cachenetworks) & [BallisticOK](https://github.com/BallisticOK). Both are copyright holders.
 
-- ✅ You **may** read the code and run the official release builds for personal use.
-- ❌ Without **written permission from one or both owners** you **may not** use, copy or fork the code for your own use, modify it, rebuild it, redistribute it or use it commercially.
-- ⚖️ Unauthorised use is copyright infringement and will be met with takedowns and legal action.
-- 🙋 Want to use it? [**Open an issue and ask**](https://github.com/BallisticOK/CDN-Desktop/issues/new) or contact [BallisticOK](https://github.com/BallisticOK) or [cachenetworks](https://github.com/cachenetworks).
+CDN Desktop is licensed under the **Cache Networks and BallisticOK Source-Available Personal & Community Contribution License, Version 2.0**.
 
-See [LICENSE](LICENSE) for the full terms.
+- ✅ **Personal use:** view, download, run, privately build and privately modify the app for non-commercial use.
+- ✅ **Community contributions:** fork on GitHub for genuine development, testing, bug fixes and pull requests back to CDN Desktop, subject to the license conditions.
+- ✅ **Attribution:** keep the LICENSE file and existing notices in permitted copies and contribution forks.
+- ❌ **No independent distribution:** do not publish your own releases, installers, packages, mirrors or rebranded versions without written permission from an Owner.
+- ❌ **No commercial or organisational use:** a separate written licence or permission is required.
+- ❌ **No copying protected code into another distributed project** without permission; attribution alone is not permission.
+
+For licensing enquiries or exceptions, [open an issue](https://github.com/BallisticOK/CDN-Desktop/issues/new) or contact [BallisticOK](https://github.com/BallisticOK) or [cachenetworks](https://github.com/cachenetworks).
+
+See [LICENSE](LICENSE) for the complete binding terms.
 
 <div align="center">
 <br>
