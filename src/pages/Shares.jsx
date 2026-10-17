@@ -10,6 +10,7 @@ export default function Shares() {
   const [page, setPage] = useState(1);
   const [viewing, setViewing] = useState(null);
   const [editing, setEditing] = useState(null);
+  const [selected, setSelected] = useState(new Set());
   const { data, error, loading, reload } = useApi((pid) => api(pid, 'GET', '/api/v1/shares', { query: { state, page, limit: 50 } }), [state, page]);
   const shares = listOf(data, 'shares');
   const pg = data?.pagination;
@@ -20,23 +21,38 @@ export default function Shares() {
     catch (e) { toast(e.message, 'error'); }
   };
 
+  const isActive = (s) => !s.revoked_at && s.state !== 'revoked' && s.state !== 'inactive' && s.active !== false;
+  const toggle = (id) => { const n = new Set(selected); n.has(id) ? n.delete(id) : n.add(id); setSelected(n); };
+  const bulkRevoke = async () => {
+    const list = shares.filter((s) => selected.has(s.id) && isActive(s));
+    if (!list.length) { toast('No active links selected', 'warn'); return; }
+    if (!(await confirm({ title: `Revoke ${list.length} share link${list.length > 1 ? 's' : ''}?`, message: 'Anyone with these links will immediately lose access.', danger: true, confirmText: 'Revoke all' }))) return;
+    const r = await Promise.allSettled(list.map((s) => api(activeId, 'POST', `/api/v1/shares/${s.id}/revoke`)));
+    toast(`Revoked ${r.filter((x) => x.status === 'fulfilled').length} of ${list.length}`, 'success');
+    setSelected(new Set()); reload();
+  };
+
   return (
     <div className="page">
       <PageHeader icon={Share2} title="Share links" subtitle="Human-friendly links for files, with passwords, expiry and download limits">
         <Segmented value={state} onChange={(v) => { setState(v); setPage(1); }} options={[{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }, { value: 'all', label: 'All' }]} />
         <Button icon={RefreshCw} onClick={reload} />
       </PageHeader>
+      {selected.size > 0 && (
+        <div className="bulkbar"><b>{selected.size} selected</b><Button size="sm" variant="ghost-danger" icon={Ban} onClick={bulkRevoke}>Revoke selected</Button><div className="grow" /><Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>Clear</Button></div>
+      )}
       {loading ? <Loading /> : error ? <ErrorState error={error} onRetry={reload} /> : !shares.length ? (
         <Empty icon={Share2} title="No share links" action={<Button onClick={() => navigate('files')}>Go to files</Button>}>Right-click any file and choose “Create share link…”.</Empty>
       ) : (
         <div className="card">
           <table className="table">
-            <thead><tr><th>File</th><th>Status</th><th>Downloads</th><th>Protection</th><th>Expires</th><th>Created</th><th /></tr></thead>
+            <thead><tr><th style={{ width: 36 }}><input type="checkbox" checked={shares.length > 0 && selected.size === shares.length} onChange={(e) => setSelected(new Set(e.target.checked ? shares.map((s) => s.id) : []))} /></th><th>File</th><th>Status</th><th>Downloads</th><th>Protection</th><th>Expires</th><th>Created</th><th /></tr></thead>
             <tbody>
               {shares.map((s) => {
                 const isActive = !s.revoked_at && s.state !== 'revoked' && s.state !== 'inactive' && s.active !== false;
                 return (
-                  <tr key={s.id}>
+                  <tr key={s.id} className={selected.has(s.id) ? 'selected' : ''}>
+                    <td><input type="checkbox" checked={selected.has(s.id)} onChange={() => toggle(s.id)} /></td>
                     <td><div className="ellipsis" style={{ maxWidth: 320 }}><b>{s.file?.name || s.file_name || s.file_id}</b></div>{s.message && <small className="muted">“{s.message}”</small>}</td>
                     <td><Badge tone={isActive ? 'green' : 'neutral'} dot>{s.state || (isActive ? 'active' : 'inactive')}</Badge></td>
                     <td>{num(s.download_count ?? s.downloads ?? 0)}{s.max_downloads ? <span className="muted"> / {s.max_downloads}</span> : ''}</td>

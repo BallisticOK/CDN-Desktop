@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   FolderOpen, Upload, FolderPlus, Search, LayoutGrid, List, RefreshCw, ChevronRight, Home, Download, Trash2, Link2,
   Eye, Pencil, FolderInput, Copy, Share2, History, FileEdit, Globe, Lock, Zap, Info, ClipboardPaste, X, FolderUp,
-  ExternalLink, CheckSquare, Shield, ArrowDownWideNarrow, ArrowUpNarrowWide, MoreHorizontal, Image as ImageIcon,
+  ExternalLink, CheckSquare, Shield, Check, ArrowDownWideNarrow, ArrowUpNarrowWide, MoreHorizontal, Image as ImageIcon,
 } from 'lucide-react';
 import { useApp } from '../lib/store.jsx';
 import { api, cdn, listOf, bytes, ago, date, fileKind, isEditable, VISIBILITIES, VIS_LABEL, classNames, num } from '../lib/util.js';
@@ -94,6 +94,10 @@ export default function Files({ params = {} }) {
   const navigateTo = (id) => { setFolderId(id); setQLive(''); setQ(''); setDetailsId(null); };
 
   const selectedFiles = useMemo(() => files.filter((f) => selected.has(f.id)), [files, selected]);
+  const selectedFolders = useMemo(() => folders.filter((f) => selected.has(f.id)), [folders, selected]);
+  const allItems = useMemo(() => [...folders, ...files], [folders, files]);
+  const allSelected = allItems.length > 0 && allItems.every((x) => selected.has(x.id));
+  const selectAll = () => setSelected(new Set(allItems.map((x) => x.id)));
   const detailsFile = files.find((f) => f.id === detailsId) || null;
 
   const replaceFile = (f) => setFiles((prev) => prev.map((x) => (x.id === f.id ? { ...x, ...f } : x)));
@@ -155,12 +159,13 @@ export default function Files({ params = {} }) {
     uploadPaths(paths, targetFolder);
   };
   const startDrag = (e, f) => {
-    const ids = selected.has(f.id) ? [...selected] : [f.id];
-    e.dataTransfer.setData('application/x-cdn-files', JSON.stringify({ files: ids }));
+    const payload = selected.has(f.id) ? { files: selectedFiles.map((x) => x.id), folders: selectedFolders.map((x) => x.id) } : { files: [f.id] };
+    e.dataTransfer.setData('application/x-cdn-files', JSON.stringify(payload));
     e.dataTransfer.effectAllowed = 'move';
   };
   const startFolderDrag = (e, fo) => {
-    e.dataTransfer.setData('application/x-cdn-files', JSON.stringify({ folders: [fo.id] }));
+    const payload = selected.has(fo.id) ? { files: selectedFiles.map((x) => x.id), folders: selectedFolders.map((x) => x.id) } : { folders: [fo.id] };
+    e.dataTransfer.setData('application/x-cdn-files', JSON.stringify(payload));
     e.dataTransfer.effectAllowed = 'move';
   };
 
@@ -217,6 +222,47 @@ export default function Files({ params = {} }) {
   };
   const doDelete = (list) => deleteFiles(app, list, { onDone: () => { removeFiles(list.map((f) => f.id)); load(true); } });
 
+  // ---------------------------------------------------------------- bulk (files + folders)
+  const bulkDelete = async (fileList = selectedFiles, folderList = selectedFolders) => {
+    if (!folderList.length) return doDelete(fileList);
+    const parts = [fileList.length && `${fileList.length} file${fileList.length > 1 ? 's' : ''}`, `${folderList.length} folder${folderList.length > 1 ? 's' : ''}`].filter(Boolean).join(' and ');
+    const inner = folderList.reduce((a, f) => a + (f.file_count || 0), 0);
+    if (!(await confirm({ title: `Delete ${parts}?`, message: `Folders are deleted with everything inside them${inner ? ` (about ${num(inner)} files)` : ''}. Files go to the recycle bin.`, danger: true, confirmText: 'Delete' }))) return;
+    const results = await Promise.allSettled([
+      ...folderList.map((fo) => api(activeId, 'DELETE', `/api/v1/folders/${fo.id}`, { query: { recursive: 'true' } })),
+      fileList.length ? api(activeId, 'POST', '/api/v1/files/bulk-delete', { body: { ids: fileList.map((f) => f.id) } }) : null,
+    ].filter(Boolean));
+    const failed = results.filter((r) => r.status === 'rejected');
+    toast(failed.length ? `${failed.length} deletion(s) failed: ${failed[0].reason.message}` : `Deleted ${parts}`, failed.length ? 'warn' : 'success');
+    setSelected(new Set()); load(true);
+  };
+  const bulkVisibility = async (v) => {
+    if (selectedFiles.length) await setVis(selectedFiles, v);
+    if (selectedFolders.length) {
+      const r = await Promise.allSettled(selectedFolders.map((fo) => api(activeId, 'PATCH', `/api/v1/folders/${fo.id}`, { body: { visibility: v } })));
+      if (!selectedFiles.length) toast(`Visibility set to ${VIS_LABEL[v]}`, r.some((x) => x.status === 'rejected') ? 'warn' : 'success');
+      load(true);
+    }
+  };
+  const bulkPurge = async () => {
+    try {
+      if (selectedFiles.length) await api(activeId, 'POST', '/api/v1/cache/purge', { body: { type: 'file', targets: selectedFiles.map((f) => f.id) } });
+      if (selectedFolders.length) await api(activeId, 'POST', '/api/v1/cache/purge', { body: { type: 'folder', targets: selectedFolders.map((f) => f.id) } });
+      toast('Cache purge queued', 'success');
+    } catch (e) { toast(e.message, 'error'); }
+  };
+  const bulkMove = () => setMoving({ files: selectedFiles.map((f) => f.id), folders: selectedFolders.map((f) => f.id) });
+  const bulkMenuItems = () => [
+    { header: `${selected.size} items selected` },
+    selectedFiles.length > 0 && { label: `Download ${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''}`, icon: Download, onClick: () => downloadFiles(app, selectedFiles) },
+    selectedFiles.length > 0 && { label: 'Copy links', icon: Link2, onClick: () => copyLinks(app, selectedFiles) },
+    { label: 'Move to…', icon: FolderInput, onClick: bulkMove },
+    { label: 'Visibility', icon: Shield, submenu: VISIBILITIES.map((v) => ({ label: VIS_LABEL[v], onClick: () => bulkVisibility(v) })) },
+    { label: 'Purge from cache', icon: Zap, onClick: bulkPurge },
+    { divider: true },
+    { label: `Delete ${selected.size} items`, icon: Trash2, danger: true, onClick: () => bulkDelete() },
+  ];
+
   const openFile = (f) => {
     const kind = fileKind(f);
     if (['image', 'video', 'audio', 'pdf', 'text'].includes(kind)) setPreview(files.filter((x) => ['image', 'video', 'audio', 'pdf', 'text'].includes(fileKind(x))).findIndex((x) => x.id === f.id));
@@ -224,6 +270,7 @@ export default function Files({ params = {} }) {
   };
 
   const fileMenu = (e, f) => {
+    if (selected.has(f.id) && selectedFolders.length) return openMenu(e, bulkMenuItems());
     let list = selected.has(f.id) ? selectedFiles : [f];
     if (!selected.has(f.id)) { setSelected(new Set([f.id])); setAnchor(f.id); }
     const multi = list.length > 1;
@@ -259,7 +306,7 @@ export default function Files({ params = {} }) {
       { label: multi ? `Delete ${list.length} files` : 'Delete', icon: Trash2, danger: true, onClick: () => doDelete(list), shortcut: 'Del' },
     ]);
   };
-  const folderMenu = (e, fo) => openMenu(e, [
+  const folderMenu = (e, fo) => (selected.has(fo.id) && selected.size > 1) ? openMenu(e, bulkMenuItems()) : openMenu(e, [
     { label: 'Open', icon: FolderOpen, onClick: () => navigateTo(fo.id) },
     { label: 'Upload here…', icon: Upload, onClick: async () => uploadPaths(await cdn.dialog.openFiles({}), fo.id) },
     { divider: true },
@@ -279,22 +326,55 @@ export default function Files({ params = {} }) {
       { label: 'Paste image from clipboard', icon: ClipboardPaste, onClick: pasteClipboard },
       { label: 'New folder', icon: FolderPlus, onClick: newFolder },
       { divider: true },
-      { label: 'Select all', icon: CheckSquare, onClick: () => setSelected(new Set(files.map((f) => f.id))), shortcut: 'Ctrl+A' },
+      { label: 'Select all', icon: CheckSquare, onClick: selectAll, shortcut: 'Ctrl+A' },
       { label: 'Refresh', icon: RefreshCw, onClick: () => load(), shortcut: 'F5' },
     ]);
   };
 
   // ---------------------------------------------------------------- selection
+  const toggle = (id) => { const next = new Set(selected); next.has(id) ? next.delete(id) : next.add(id); setSelected(next); setAnchor(id); };
   const clickFile = (e, f) => {
     if (e.shiftKey && anchor) {
-      const a = files.findIndex((x) => x.id === anchor); const b = files.findIndex((x) => x.id === f.id);
+      const a = allItems.findIndex((x) => x.id === anchor); const b = allItems.findIndex((x) => x.id === f.id);
       const [s, t] = a < b ? [a, b] : [b, a];
       const next = new Set(e.ctrlKey ? selected : []);
-      files.slice(s, t + 1).forEach((x) => next.add(x.id));
+      allItems.slice(s, t + 1).forEach((x) => next.add(x.id));
       setSelected(next);
-    } else if (e.ctrlKey || e.metaKey) {
-      const next = new Set(selected); next.has(f.id) ? next.delete(f.id) : next.add(f.id); setSelected(next); setAnchor(f.id);
-    } else { setSelected(new Set([f.id])); setAnchor(f.id); if (detailsId) setDetailsId(f.id); }
+    } else if (e.ctrlKey || e.metaKey) toggle(f.id);
+    else { setSelected(new Set([f.id])); setAnchor(f.id); if (detailsId && files.some((x) => x.id === f.id)) setDetailsId(f.id); }
+  };
+  const checkbox = (id) => (
+    <button className={classNames('sel-check', selected.has(id) && 'on')} title="Select" onClick={(e) => { e.stopPropagation(); if (e.shiftKey) clickFile(e, { id }); else toggle(id); }} onDoubleClick={(e) => e.stopPropagation()}>
+      <Check size={12} strokeWidth={3} />
+    </button>
+  );
+
+  // Rubber-band selection: drag on empty space to select everything the box touches.
+  const scrollRef = useRef(null);
+  const [band, setBand] = useState(null);
+  const bandMoved = useRef(false);
+  const onBandStart = (e) => {
+    if (e.button !== 0 || e.target.closest('.tile, .row-item, button, input, a, .load-more')) return;
+    const el = scrollRef.current; const r = el.getBoundingClientRect();
+    const start = { x: e.clientX - r.left + el.scrollLeft, y: e.clientY - r.top + el.scrollTop };
+    const base = e.ctrlKey || e.shiftKey ? new Set(selected) : new Set();
+    bandMoved.current = false;
+    const move = (ev) => {
+      const cur = { x: ev.clientX - r.left + el.scrollLeft, y: ev.clientY - r.top + el.scrollTop };
+      const box = { left: Math.min(start.x, cur.x), top: Math.min(start.y, cur.y), width: Math.abs(cur.x - start.x), height: Math.abs(cur.y - start.y) };
+      if (box.width + box.height < 6 && !bandMoved.current) return;
+      bandMoved.current = true;
+      setBand(box);
+      const next = new Set(base);
+      el.querySelectorAll('[data-sel-id]').forEach((node) => {
+        const b = node.getBoundingClientRect();
+        const nb = { left: b.left - r.left + el.scrollLeft, top: b.top - r.top + el.scrollTop, right: b.right - r.left + el.scrollLeft, bottom: b.bottom - r.top + el.scrollTop };
+        if (nb.left < box.left + box.width && nb.right > box.left && nb.top < box.top + box.height && nb.bottom > box.top) next.add(node.dataset.selId);
+      });
+      setSelected(next);
+    };
+    const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); setBand(null); };
+    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
   };
 
   // Keyboard shortcuts
@@ -302,9 +382,9 @@ export default function Files({ params = {} }) {
     const k = (e) => {
       if (e.target?.closest?.('input, textarea, select, .cm-editor, .modal')) return;
       if (preview !== null || editing) return;
-      if (e.key === 'a' && e.ctrlKey) { e.preventDefault(); setSelected(new Set(files.map((f) => f.id))); }
+      if (e.key === 'a' && e.ctrlKey) { e.preventDefault(); selectAll(); }
       else if (e.key === 'Escape') { setSelected(new Set()); setDetailsId(null); }
-      else if (e.key === 'Delete' && selectedFiles.length) doDelete(selectedFiles);
+      else if (e.key === 'Delete' && selected.size) bulkDelete();
       else if (e.key === 'F2' && selectedFiles.length === 1) renameFile(selectedFiles[0]);
       else if (e.key === 'F5') { e.preventDefault(); load(); }
       else if (e.key === 'Enter' && selectedFiles.length === 1) openFile(selectedFiles[0]);
@@ -323,7 +403,7 @@ export default function Files({ params = {} }) {
 
   return (
     <div className={classNames('page files-page', detailsFile && 'with-drawer')} onDragEnter={onDragEnter} onDragLeave={onDragLeave} onDragOver={onDragOver} onDrop={(e) => onDrop(e)}>
-      <div className="files-main" onContextMenu={bgMenu} onClick={(e) => { if (!e.target?.closest?.('.tile, .row-item, .bulkbar, .toolbar')) setSelected(new Set()); }}>
+      <div className="files-main" onContextMenu={bgMenu} onClick={(e) => { if (bandMoved.current) { bandMoved.current = false; return; } if (!e.target?.closest?.('.tile, .row-item, .bulkbar, .toolbar, .filterbar')) setSelected(new Set()); }}>
         <div className="toolbar">
           <div className="crumbs">
             <button className={classNames('crumb', !folderId && !searching && 'current', dropFolder === 'root' && 'drop')} onClick={() => navigateTo(null)}
@@ -361,25 +441,28 @@ export default function Files({ params = {} }) {
           {searching && <Segmented value={scopeAll ? 'all' : 'here'} onChange={(v) => setScopeAll(v === 'all')} options={[{ value: 'all', label: 'Everywhere' }, { value: 'here', label: 'This folder' }]} />}
           <div className="grow" />
           <span className="muted small">{pagination ? `${num(files.length)} of ${num(pagination.total)} files` : ''}{folders.length ? ` · ${folders.length} folders` : ''}</span>
+          <Button size="sm" variant="ghost" icon={CheckSquare} onClick={() => (allSelected ? setSelected(new Set()) : selectAll())} title="Select all (Ctrl+A)">{allSelected ? 'Clear' : 'Select all'}</Button>
           <Button size="sm" variant="ghost" icon={RefreshCw} onClick={() => load()} title="Refresh (F5)" />
           <Segmented value={view} onChange={setView} options={[{ value: 'grid', icon: LayoutGrid, title: 'Grid' }, { value: 'list', icon: List, title: 'List' }]} />
         </div>
 
         {selected.size > 0 && (
           <div className="bulkbar">
-            <b>{selected.size} selected</b>
-            <Button size="sm" variant="ghost" icon={Download} onClick={() => downloadFiles(app, selectedFiles)}>Download</Button>
-            <Button size="sm" variant="ghost" icon={Link2} onClick={() => copyLinks(app, selectedFiles)}>Copy links</Button>
-            <Button size="sm" variant="ghost" icon={FolderInput} onClick={() => setMoving({ files: [...selected] })}>Move</Button>
-            <Dropdown trigger={<Button size="sm" variant="ghost" icon={Shield}>Visibility</Button>} items={VISIBILITIES.map((v) => ({ label: VIS_LABEL[v], onClick: () => setVis(selectedFiles, v) }))} />
-            <Button size="sm" variant="ghost" icon={Zap} onClick={() => purgeFiles(app, selectedFiles)}>Purge</Button>
-            <Button size="sm" variant="ghost-danger" icon={Trash2} onClick={() => doDelete(selectedFiles)}>Delete</Button>
+            <b>{[selectedFiles.length && `${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''}`, selectedFolders.length && `${selectedFolders.length} folder${selectedFolders.length > 1 ? 's' : ''}`].filter(Boolean).join(' · ') || `${selected.size} selected`}</b>
+            <Button size="sm" variant="ghost" icon={Download} disabled={!selectedFiles.length} onClick={() => downloadFiles(app, selectedFiles)}>Download</Button>
+            <Button size="sm" variant="ghost" icon={Link2} disabled={!selectedFiles.length} onClick={() => copyLinks(app, selectedFiles)}>Copy links</Button>
+            <Button size="sm" variant="ghost" icon={FolderInput} onClick={bulkMove}>Move</Button>
+            <Dropdown trigger={<Button size="sm" variant="ghost" icon={Shield}>Visibility</Button>} items={VISIBILITIES.map((v) => ({ label: VIS_LABEL[v], onClick: () => bulkVisibility(v) }))} />
+            <Button size="sm" variant="ghost" icon={Zap} onClick={bulkPurge}>Purge</Button>
+            <Button size="sm" variant="ghost-danger" icon={Trash2} onClick={() => bulkDelete()}>Delete</Button>
             <div className="grow" />
+            {!allSelected && <Button size="sm" variant="ghost" onClick={selectAll}>Select all {allItems.length}</Button>}
             <Button size="sm" variant="ghost" icon={X} onClick={() => setSelected(new Set())} />
           </div>
         )}
 
-        <div className="files-scroll">
+        <div className={classNames('files-scroll', selected.size > 0 && 'selecting')} ref={scrollRef} onMouseDown={onBandStart}>
+          {band && <div className="band" style={band} />}
           {loading ? <Loading label="Loading files…" /> : error ? <ErrorState error={error} onRetry={load} /> : empty ? (
             <Empty icon={searching ? Search : FolderOpen} title={searching ? 'No matches' : 'This folder is empty'}
               action={!searching && <div className="row gap"><Button variant="primary" icon={Upload} onClick={() => pickFiles(false)}>Upload files</Button><Button icon={FolderPlus} onClick={newFolder}>New folder</Button></div>}>
@@ -390,9 +473,10 @@ export default function Files({ params = {} }) {
             {folders.length > 0 && <div className="grid-label">Folders</div>}
             <div className="tiles folder-tiles">
               {folders.map((fo) => (
-                <div key={fo.id} className={classNames('tile folder-tile', dropFolder === fo.id && 'drop')} draggable onDragStart={(e) => startFolderDrag(e, fo)}
-                  onDoubleClick={() => navigateTo(fo.id)} onContextMenu={(e) => folderMenu(e, fo)}
+                <div key={fo.id} data-sel-id={fo.id} className={classNames('tile folder-tile', dropFolder === fo.id && 'drop', selected.has(fo.id) && 'selected')} draggable onDragStart={(e) => startFolderDrag(e, fo)}
+                  onClick={(e) => clickFile(e, fo)} onDoubleClick={() => navigateTo(fo.id)} onContextMenu={(e) => folderMenu(e, fo)}
                   onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDropFolder(fo.id); }} onDragLeave={() => setDropFolder(null)} onDrop={(e) => onDrop(e, fo.id)}>
+                  {checkbox(fo.id)}
                   <FileIcon folder size={44} />
                   <div className="tile-meta"><div className="tile-name">{fo.name}</div><small>{num(fo.file_count || 0)} files{fo.folder_count ? ` · ${fo.folder_count} folders` : ''}</small></div>
                   {fo.visibility && fo.visibility !== 'PUBLIC' && <Lock size={13} className="tile-lock" />}
@@ -402,10 +486,11 @@ export default function Files({ params = {} }) {
             {folders.length > 0 && files.length > 0 && <div className="grid-label">Files</div>}
             <div className="tiles">
               {files.map((f) => (
-                <div key={f.id} className={classNames('tile file-tile', selected.has(f.id) && 'selected')} draggable onDragStart={(e) => startDrag(e, f)}
+                <div key={f.id} data-sel-id={f.id} className={classNames('tile file-tile', selected.has(f.id) && 'selected')} draggable onDragStart={(e) => startDrag(e, f)}
                   onClick={(e) => clickFile(e, f)} onDoubleClick={() => openFile(f)} onContextMenu={(e) => fileMenu(e, f)}>
                   <div className="tile-cover">
                     <FileIcon file={f} thumb cover />
+                    {checkbox(f.id)}
                     {f.duration_seconds ? <span className="tile-dur">{Math.floor(f.duration_seconds / 60)}:{String(Math.round(f.duration_seconds % 60)).padStart(2, '0')}</span> : null}
                     {f.status && f.status !== 'READY' && <span className="tile-status"><Badge tone={f.status === 'FAILED' || f.status === 'QUARANTINED' ? 'red' : 'amber'}>{f.status.toLowerCase()}</Badge></span>}
                     <button className="tile-more" onClick={(e) => fileMenu(e, f)}><MoreHorizontal size={16} /></button>
@@ -421,11 +506,12 @@ export default function Files({ params = {} }) {
             </>
           ) : (
             <table className="table files-table">
-              <thead><tr><th style={{ width: '46%' }}>Name</th><th>Size</th><th>Visibility</th><th>Downloads</th><th>Added</th><th style={{ width: 40 }} /></tr></thead>
+              <thead><tr><th style={{ width: 36 }}><button className={classNames('sel-check', 'static', allSelected && 'on')} onClick={() => (allSelected ? setSelected(new Set()) : selectAll())} title="Select all"><Check size={12} strokeWidth={3} /></button></th><th style={{ width: '46%' }}>Name</th><th>Size</th><th>Visibility</th><th>Downloads</th><th>Added</th><th style={{ width: 40 }} /></tr></thead>
               <tbody>
                 {folders.map((fo) => (
-                  <tr key={fo.id} className={classNames('row-item', dropFolder === fo.id && 'drop')} draggable onDragStart={(e) => startFolderDrag(e, fo)} onDoubleClick={() => navigateTo(fo.id)} onContextMenu={(e) => folderMenu(e, fo)}
+                  <tr key={fo.id} data-sel-id={fo.id} className={classNames('row-item', dropFolder === fo.id && 'drop', selected.has(fo.id) && 'selected')} draggable onDragStart={(e) => startFolderDrag(e, fo)} onClick={(e) => clickFile(e, fo)} onDoubleClick={() => navigateTo(fo.id)} onContextMenu={(e) => folderMenu(e, fo)}
                     onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDropFolder(fo.id); }} onDragLeave={() => setDropFolder(null)} onDrop={(e) => onDrop(e, fo.id)}>
+                    <td>{checkbox(fo.id)}</td>
                     <td><div className="name-cell"><FileIcon folder size={30} /><span>{fo.name}</span></div></td>
                     <td className="muted">{num(fo.file_count || 0)} files</td>
                     <td>{fo.visibility && <Badge tone={visTone(fo.visibility)}>{VIS_LABEL[fo.visibility]}</Badge>}</td>
@@ -434,8 +520,9 @@ export default function Files({ params = {} }) {
                   </tr>
                 ))}
                 {files.map((f) => (
-                  <tr key={f.id} className={classNames('row-item', selected.has(f.id) && 'selected')} draggable onDragStart={(e) => startDrag(e, f)}
+                  <tr key={f.id} data-sel-id={f.id} className={classNames('row-item', selected.has(f.id) && 'selected')} draggable onDragStart={(e) => startDrag(e, f)}
                     onClick={(e) => clickFile(e, f)} onDoubleClick={() => openFile(f)} onContextMenu={(e) => fileMenu(e, f)}>
+                    <td>{checkbox(f.id)}</td>
                     <td><div className="name-cell"><FileIcon file={f} size={30} thumb /><span className="ellipsis" title={f.name}>{f.name}</span>{searching && <small className="muted">{f.folder_path || '/'}</small>}</div></td>
                     <td className="muted nowrap">{bytes(f.size)}</td>
                     <td><Badge tone={visTone(f.visibility)}>{VIS_LABEL[f.visibility] || f.visibility}</Badge></td>

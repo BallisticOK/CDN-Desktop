@@ -83,13 +83,13 @@ function maskKey(key) {
 }
 function publicProfile(p) {
   const key = decryptKey(p.key);
-  const { key: _k, ...rest } = p;
-  return { ...rest, hasKey: !!key, keyPreview: maskKey(key) };
+  const { key: _k, session: _s, csrf: _c, ...rest } = p;
+  return { ...rest, hasKey: !!key, keyPreview: maskKey(key), hasStaffSession: !!p.session };
 }
 function getProfile(id) {
   const p = config.profiles.find((x) => x.id === (id || config.activeId));
   if (!p) throw new Error('No server selected. Add one in Settings → Servers.');
-  return { ...p, apiKey: decryptKey(p.key), baseUrl: normalizeBase(p.baseUrl) };
+  return { ...p, apiKey: decryptKey(p.key), cookie: decryptKey(p.session), csrf: decryptKey(p.csrf), baseUrl: normalizeBase(p.baseUrl) };
 }
 function normalizeBase(u) {
   u = String(u || '').trim();
@@ -122,10 +122,44 @@ function pickHeaders(res) {
   return out;
 }
 
-async function apiRequest({ profileId, method = 'GET', path: p, query, body, baseUrl, apiKey, timeoutMs = 60000 }) {
-  const profile = baseUrl ? { baseUrl: normalizeBase(baseUrl), apiKey } : getProfile(profileId);
+function sessionHeaders(profile, method, extra = {}) {
+  const h = { 'User-Agent': `CDN-Desktop/${app.getVersion()}`, Origin: profile.baseUrl, ...extra };
+  if (profile.cookie) h.Cookie = profile.cookie;
+  if (profile.csrf && method !== 'GET') h['X-CSRF-Token'] = profile.csrf;
+  return h;
+}
+function cookiesFrom(res) {
+  const list = typeof res.headers.getSetCookie === 'function' ? res.headers.getSetCookie() : [res.headers.get('set-cookie')].filter(Boolean);
+  return list.map((c) => c.split(';')[0].trim()).filter((c) => c && !/=$/.test(c)).join('; ');
+}
+
+// Uses the API key; endpoints that only accept a staff session are retried with the
+// signed-in staff session (if any). `mode: 'session'` forces the session.
+async function apiRequest(req) {
+  const profile = req.baseUrl ? { baseUrl: normalizeBase(req.baseUrl), apiKey: req.apiKey } : getProfile(req.profileId);
+  const preferSession = req.mode === 'session' || (!profile.apiKey && profile.cookie);
+  let res = await rawRequest(profile, req, preferSession);
+  if (!preferSession && profile.cookie && res.status === 403 && res.error?.code === 'staff_session_required') res = await rawRequest(profile, req, true);
+  if (res.usedSession && res.ok && profile.id && req.path === '/api/v1/auth/session' && res.data?.csrf_token) {
+    const stored = config.profiles.find((x) => x.id === profile.id);
+    if (stored) { stored.csrf = encryptKey(res.data.csrf_token); saveConfig(); }
+  }
+  // Only discard the session if the server confirms it is no longer valid.
+  if (res.usedSession && res.status === 401 && profile.id && req.path !== '/api/v1/auth/session') {
+    const check = await rawRequest(profile, { path: '/api/v1/auth/session', timeoutMs: 15000 }, true);
+    if (check.ok || check.status !== 401) return res;
+  }
+  if (res.usedSession && res.status === 401 && profile.id) {
+    const stored = config.profiles.find((x) => x.id === profile.id);
+    if (stored) { stored.session = ''; stored.csrf = ''; saveConfig(); win?.webContents.send('profiles:changed'); }
+    res.error = { code: 'staff_session_expired', message: 'Your staff session has expired. Sign in again in the server settings.' };
+  }
+  return res;
+}
+
+async function rawRequest(profile, { method = 'GET', path: p, query, body, timeoutMs = 60000 }, useSession) {
   const url = buildUrl(profile.baseUrl, p, query);
-  const headers = authHeaders(profile, { Accept: 'application/json' });
+  const headers = useSession ? sessionHeaders(profile, method, { Accept: 'application/json' }) : authHeaders(profile, { Accept: 'application/json' });
   let payload;
   if (body !== undefined && body !== null && method !== 'GET') { headers['Content-Type'] = 'application/json'; payload = JSON.stringify(body); }
   const started = Date.now();
@@ -134,7 +168,7 @@ async function apiRequest({ profileId, method = 'GET', path: p, query, body, bas
     const text = await res.text();
     let data = null;
     try { data = text ? JSON.parse(text) : null; } catch { data = text; }
-    const out = { ok: res.ok, status: res.status, data, headers: pickHeaders(res), ms: Date.now() - started, url };
+    const out = { ok: res.ok, status: res.status, data, headers: pickHeaders(res), ms: Date.now() - started, url, usedSession: !!useSession };
     if (!res.ok) out.error = (data && data.error) || { code: `http_${res.status}`, message: res.statusText || 'Request failed' };
     return out;
   } catch (e) {
@@ -573,6 +607,43 @@ function registerIpc() {
   });
 
   handle('api:request', (req) => apiRequest(req));
+
+  // Staff sign-in: unlocks endpoints that API keys cannot use (storage, API keys, webhooks, …).
+  const finishLogin = (stored, res) => {
+    const cookie = cookiesFrom(res.raw);
+    if (!cookie) throw new Error('The server did not return a session cookie.');
+    stored.session = encryptKey(cookie);
+    stored.csrf = encryptKey(res.data?.csrf_token || '');
+    stored.staffUser = { name: res.data?.user?.name || '', email: res.data?.user?.email || '', roles: res.data?.roles || [] };
+    saveConfig();
+    return { ok: true, user: stored.staffUser };
+  };
+  const loginCall = async (stored, path, body) => {
+    const base = normalizeBase(stored.baseUrl);
+    const r = await fetch(base + path, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', Origin: base, 'User-Agent': `CDN-Desktop/${app.getVersion()}` }, body: JSON.stringify(body), signal: AbortSignal.timeout(20000) });
+    let data = null; try { data = await r.json(); } catch {}
+    if (!r.ok) throw new Error(data?.error?.message || `Sign-in failed (HTTP ${r.status})`);
+    return { data, raw: r };
+  };
+  handle('staff:login', async ({ id, email, password }) => {
+    const stored = config.profiles.find((x) => x.id === id);
+    if (!stored) throw new Error('Save the server first.');
+    const res = await loginCall(stored, '/api/v1/auth/login', { email, password, remember_me: true });
+    if (res.data?.mfa_required) return { mfa: true, mfaToken: res.data.mfa_token };
+    return finishLogin(stored, res);
+  });
+  handle('staff:mfa', async ({ id, mfaToken, code }) => {
+    const stored = config.profiles.find((x) => x.id === id);
+    return finishLogin(stored, await loginCall(stored, '/api/v1/auth/login/mfa', { mfa_token: mfaToken, code: String(code).replace(/\s+/g, '') }));
+  });
+  handle('staff:logout', async (id) => {
+    const stored = config.profiles.find((x) => x.id === id);
+    if (!stored) return true;
+    if (stored.session) await apiRequest({ profileId: id, method: 'POST', path: '/api/v1/auth/logout', mode: 'session' }).catch(() => {});
+    stored.session = ''; stored.csrf = ''; stored.staffUser = null;
+    saveConfig();
+    return true;
+  });
   const specCache = new Map();
   handle('api:openapi', async (profileId, force) => {
     const profile = getProfile(profileId);

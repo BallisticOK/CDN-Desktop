@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   LayoutDashboard, FolderOpen, ArrowDownUp, Share2, Trash2, BarChart3, Zap, Globe2, KeyRound, TerminalSquare,
   Settings as SettingsIcon, ChevronsUpDown, Plus, Check, Server, Upload, Cloud, Sparkles, Webhook,
+  UserCircle, Users as UsersIcon, ScrollText, ShieldAlert, LogIn, LogOut,
 } from 'lucide-react';
 import { useApp } from './lib/store.jsx';
 import { classNames, initials } from './lib/util.js';
@@ -19,6 +20,8 @@ import ApiKeys from './pages/ApiKeys.jsx';
 import Webhooks from './pages/Webhooks.jsx';
 import Console from './pages/Console.jsx';
 import Settings from './pages/Settings.jsx';
+import { Account, Users, Audit, Security, StaffGate } from './pages/Admin.jsx';
+import { LoginDialog } from './components/StaffLogin.jsx';
 
 const NAV = [
   { group: 'Workspace' },
@@ -35,13 +38,19 @@ const NAV = [
   { name: 'keys', label: 'API keys', icon: KeyRound },
   { name: 'webhooks', label: 'Webhooks', icon: Webhook },
   { name: 'console', label: 'API console', icon: TerminalSquare },
+  { group: 'Admin', staff: true },
+  { name: 'account', label: 'My account', icon: UserCircle, staff: true },
+  { name: 'users', label: 'Users', icon: UsersIcon, staff: true },
+  { name: 'audit', label: 'Audit log', icon: ScrollText, staff: true },
+  { name: 'security', label: 'Security', icon: ShieldAlert, staff: true },
 ];
 
-const PAGES = { dashboard: Dashboard, files: Files, transfers: Transfers, shares: Shares, trash: Trash, analytics: Analytics, cache: Cache, zones: Zones, keys: ApiKeys, webhooks: Webhooks, console: Console, settings: Settings };
+const StaffKeys = () => <StaffGate title="API keys" icon={KeyRound}><ApiKeys /></StaffGate>;
+const StaffWebhooks = () => <StaffGate title="Webhooks" icon={Webhook}><Webhooks /></StaffGate>;
+const PAGES = { dashboard: Dashboard, files: Files, transfers: Transfers, shares: Shares, trash: Trash, analytics: Analytics, cache: Cache, zones: Zones, keys: StaffKeys, webhooks: StaffWebhooks, console: Console, settings: Settings, account: Account, users: Users, audit: Audit, security: Security };
 
 export default function App() {
-  const { profiles, active, page, navigate, settings, setActive, meError } = useApp();
-  const [editor, setEditor] = useState(null);
+  const { profiles, active, page, navigate, settings, setActive, meError, serverEditor: editor, editServer: setEditor } = useApp();
 
   // Ctrl+1..9 switches servers, Ctrl+, opens settings
   useEffect(() => {
@@ -73,10 +82,11 @@ export default function App() {
               <Button size="sm" onClick={() => setEditor(active)}>Edit server</Button>
             </div>
           )}
-          {!profiles.length && page.name !== 'settings' ? <Welcome onAdd={() => setEditor({})} /> : <Page key={`${page.name}:${active?.id}`} params={page.params} />}
+          {!profiles.length && page.name !== 'settings' ? <Welcome onAdd={() => setEditor({})} /> : <Page key={`${page.name}:${active?.id}:${active?.hasStaffSession ? 's' : ''}`} params={page.params} />}
         </main>
       </div>
       {editor && <ServerEditor profile={editor} onClose={() => setEditor(null)} />}
+      <LoginDialog />
       <DialogHost />
       <Toasts />
     </div>
@@ -103,7 +113,7 @@ function TitleBar() {
 }
 
 function Sidebar({ onAddServer }) {
-  const { profiles, active, setActive, page, navigate, transfers, meError } = useApp();
+  const { profiles, active, setActive, page, navigate, transfers, meError, hasStaff, staff, openLogin, staffSignOut } = useApp();
   const [menu, setMenu] = useState(null);
   const running = useMemo(() => Object.values(transfers).filter((t) => t.status === 'running' || t.status === 'queued'), [transfers]);
   const progress = running.length ? running.reduce((a, t) => a + (t.loaded || 0), 0) / Math.max(1, running.reduce((a, t) => a + (t.size || 0), 0)) : 0;
@@ -136,8 +146,8 @@ function Sidebar({ onAddServer }) {
       </button>
 
       <nav className="nav">
-        {NAV.map((n, i) => n.group ? <div key={i} className="nav-group">{n.group}</div> : (
-          <button key={n.name} className={classNames('nav-item', page.name === n.name && 'active')} onClick={() => navigate(n.name)} disabled={!active}>
+        {NAV.map((n, i) => n.group ? <div key={i} className="nav-group">{n.group}{n.staff && !hasStaff && <LockIcon />}</div> : (
+          <button key={n.name} className={classNames('nav-item', page.name === n.name && 'active', n.staff && !hasStaff && 'locked')} onClick={() => navigate(n.name)} disabled={!active}>
             <n.icon size={17} />
             <span className="grow">{n.label}</span>
             {n.name === 'transfers' && running.length > 0 && <span className="nav-badge">{running.length}</span>}
@@ -152,6 +162,18 @@ function Sidebar({ onAddServer }) {
         </button>
       )}
 
+      {active && (hasStaff ? (
+        <button className="account-chip" onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); setMenu({ x: r.left, y: r.top - 130, items: [
+          { header: staff?.user?.email || active.staffUser?.email || 'Staff account' },
+          { label: 'My account', icon: UserCircle, onClick: () => navigate('account') },
+          { label: 'Sign out', icon: LogOut, danger: true, onClick: staffSignOut },
+        ] }); }}>
+          <span className="avatar sm" style={{ background: active.color }}>{initials(staff?.user?.name || active.staffUser?.name || active.staffUser?.email || '?')}</span>
+          <span className="grow switcher-text"><b>{staff?.user?.name || active.staffUser?.name || active.staffUser?.email}</b><small>{(staff?.roles || active.staffUser?.roles || []).join(', ') || 'Staff'}</small></span>
+        </button>
+      ) : (
+        <button className="account-chip signin" onClick={() => openLogin(true)}><LogIn size={16} /><span className="grow">Sign in for admin features</span></button>
+      ))}
       <button className={classNames('nav-item', 'nav-settings', page.name === 'settings' && 'active')} onClick={() => navigate('settings')}>
         <SettingsIcon size={17} /><span className="grow">Settings</span><kbd>Ctrl ,</kbd>
       </button>
@@ -178,4 +200,8 @@ function Welcome({ onAdd }) {
       </div>
     </div>
   );
+}
+
+function LockIcon() {
+  return <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: 6, verticalAlign: -1 }}><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>;
 }

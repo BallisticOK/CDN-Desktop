@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Server, Eye, EyeOff, PlugZap, CheckCircle2, XCircle, Trash2 } from 'lucide-react';
+import { Server, Eye, EyeOff, PlugZap, CheckCircle2, XCircle, Trash2, ShieldCheck, LogOut, LogIn } from 'lucide-react';
 import { Modal, Button, Field, Select, Badge } from './ui.jsx';
 import { useApp } from '../lib/store.jsx';
+import { StaffLoginSection } from './StaffLogin.jsx';
 import { cdn, ACCENTS, VISIBILITIES, VIS_LABEL, classNames } from '../lib/util.js';
 
 export default function ServerEditor({ profile, onClose }) {
@@ -75,6 +76,8 @@ export default function ServerEditor({ profile, onClose }) {
         <Field label="Notes"><input className="input" placeholder="Optional" value={form.notes} onChange={set('notes')} /></Field>
       </div>
 
+      <StaffLoginSection profile={profile} />
+
       {test && (
         <div className={classNames('test-result', test.me?.ok ? 'ok' : 'bad')}>
           {test.error ? <div className="row"><XCircle size={18} /><span>{test.error}</span></div> : <>
@@ -94,3 +97,4 @@ export default function ServerEditor({ profile, onClose }) {
     </Modal>
   );
 }
+

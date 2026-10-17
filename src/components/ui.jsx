@@ -259,16 +259,19 @@ export function ErrorState({ error, onRetry, compact }) {
   if (!error) return null;
   const forbidden = error.status === 403 || error.code === 'forbidden' || error.code === 'insufficient_scope';
   const unauth = error.status === 401;
+  const staff = error.code === 'staff_session_required' || error.code === 'staff_session_expired';
+  const { active, editServer } = useApp();
   const Icon = forbidden || unauth ? Lock : AlertTriangle;
   return (
     <div className={classNames('error-state', compact && 'compact')}>
       <Icon size={compact ? 18 : 26} />
       <div className="grow">
-        <div className="error-title">{forbidden ? 'Not permitted' : unauth ? 'Authentication failed' : error.status === 0 ? 'Cannot reach server' : 'Something went wrong'}</div>
-        <div className="error-text">{forbidden ? `${error.message} Your API key may be missing a scope for this feature.` : error.message}</div>
+        <div className="error-title">{staff ? 'Staff sign-in required' : forbidden ? 'Not permitted' : unauth ? 'Authentication failed' : error.status === 0 ? 'Cannot reach server' : 'Something went wrong'}</div>
+        <div className="error-text">{staff ? (error.code === 'staff_session_expired' ? error.message : 'API keys can’t use this feature. Sign in with your staff account for this server to unlock it.') : forbidden ? `${error.message} Your API key may be missing a scope for this feature.` : error.message}</div>
         {error.requestId && <div className="error-req mono">request {error.requestId}</div>}
       </div>
-      {onRetry && <Button size="sm" icon={RefreshCw} onClick={() => onRetry()}>Retry</Button>}
+      {staff && active && <Button size="sm" variant="primary" icon={Lock} onClick={() => editServer({ ...active, focusStaff: true })}>Sign in as staff</Button>}
+      {onRetry && !staff && <Button size="sm" icon={RefreshCw} onClick={() => onRetry()}>Retry</Button>}
     </div>
   );
 }

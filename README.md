@@ -27,6 +27,8 @@ git push --follow-tags   # CI builds and publishes the GitHub release
 ## Features
 
 - **Multiple servers**: add each CDN (URL + API key) in Settings → Servers or from the sidebar picker, and switch with `Ctrl+1…9`. Keys are encrypted with Windows DPAPI. You can import and export your server list.
+- **Staff sign-in**: optionally sign in with your CDN dashboard account (email, password, 2FA) for each server. This unlocks what API keys can't do: storage stats, API keys, webhooks, **Users**, **Audit log**, **Security** and **My account** (sessions, password). Only the session is kept, encrypted; the password is never stored.
+- **Multi-select everywhere**: checkboxes on every file and folder, drag a box to select, `Ctrl`/`Shift`-click, `Ctrl+A`. Bulk download, copy links, move, visibility, purge and delete across files *and* folders. Bulk actions also on share links, users and the recycle bin.
 - **Files**:
   - Grid or list view, folders, breadcrumbs, search (by name, ID or SHA-256), filters and sorting.
   - Multi-select (`Ctrl`/`Shift`-click), drag-and-drop to move.
@@ -50,3 +52,30 @@ git push --follow-tags   # CI builds and publishes the GitHub release
 All HTTP requests run in Electron's main process (`electron/main.cjs`) with `Authorization: Bearer <key>`. The UI never sees the raw key and is not subject to CORS. Previews of private files go through an internal `cdnx://` protocol that adds the key.
 
 Settings live in `%APPDATA%\cdn-desktop\config.json`.
+
+## Code signing
+
+The build workflow signs the installer automatically once a certificate is configured in **GitHub → Settings → Secrets and variables → Actions**; until then it builds unsigned (and Windows SmartScreen shows a warning).
+
+**Option A: a code-signing certificate (.pfx)** from a CA such as Sectigo, SSL.com or DigiCert:
+
+| Secret | Value |
+| --- | --- |
+| `WIN_CSC_LINK` | the .pfx file, base64-encoded: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("cert.pfx")) \| Set-Clipboard` |
+| `WIN_CSC_KEY_PASSWORD` | the .pfx password |
+
+**Option B: Azure Trusted Signing** (cheapest; identity-verified, about US$10/month):
+
+| Type | Name | Value |
+| --- | --- | --- |
+| Secret | `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` | an app registration with the *Trusted Signing Certificate Profile Signer* role |
+| Variable | `AZURE_SIGNING_ENDPOINT` | e.g. `https://eus.codesigning.azure.net` |
+| Variable | `AZURE_SIGNING_ACCOUNT` | your Trusted Signing account name |
+| Variable | `AZURE_SIGNING_PROFILE` | your certificate profile name |
+| Variable | `AZURE_PUBLISHER_NAME` | the publisher name on the certificate |
+
+The workflow verifies the signature after building and fails if it is invalid.
+
+## License
+
+Proprietary, all rights reserved. No one may use, copy, modify or distribute this software without explicit written permission from the owner. See [LICENSE](LICENSE).

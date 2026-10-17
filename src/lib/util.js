@@ -7,8 +7,8 @@ export class ApiError extends Error {
   }
 }
 
-export async function api(profileId, method, path, { query, body } = {}) {
-  const r = await cdn.request({ profileId, method, path, query, body });
+export async function api(profileId, method, path, { query, body, mode } = {}) {
+  const r = await cdn.request({ profileId, method, path, query, body, mode });
   if (!r.ok) {
     throw new ApiError(r.error?.message || `Request failed (${r.status})`, { code: r.error?.code, status: r.status, requestId: r.error?.request_id });
   }
@@ -87,7 +87,7 @@ export function fileKind(f) {
   if (m.startsWith('text/') || /json|xml|javascript|yaml|toml|x-sh|sql/.test(m) || TEXT_EXT.has(ext)) return 'text';
   return 'other';
 }
-export function isEditable(f) { return fileKind(f) === 'text' && (f.size ?? 0) <= 2 * 1024 * 1024; }
+export function isEditable(f) { if (typeof f.editable === 'boolean') return f.editable; return fileKind(f) === 'text' && (f.size ?? 0) <= 2 * 1024 * 1024; }
 
 export const VISIBILITIES = ['PUBLIC', 'PRIVATE', 'AUTHENTICATED', 'SIGNED_URL_ONLY'];
 export const VIS_LABEL = { PUBLIC: 'Public', PRIVATE: 'Private', AUTHENTICATED: 'Authenticated', SIGNED_URL_ONLY: 'Signed only' };

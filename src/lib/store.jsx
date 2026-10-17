@@ -15,6 +15,9 @@ export function AppProvider({ children }) {
   const [dialog, setDialog] = useState(null);
   const [transfers, setTransfers] = useState({});
   const [filesVersion, setFilesVersion] = useState(0);
+  const [serverEditor, setServerEditor] = useState(null);
+  const [staff, setStaff] = useState(null);
+  const [loginOpen, setLoginOpen] = useState(false);
   const toastId = useRef(0);
 
   const refreshProfiles = useCallback(async () => {
@@ -43,6 +46,21 @@ export function AppProvider({ children }) {
     api(activeId, 'GET', '/api/v1/me').then((d) => alive && setMe(d)).catch((e) => alive && setMeError(e));
     return () => { alive = false; };
   }, [activeId]);
+
+  // Staff session details (roles, permissions) for the active server.
+  const activeProfile = profiles.find((p) => p.id === activeId);
+  const hasStaff = !!activeProfile?.hasStaffSession;
+  const refreshStaff = useCallback(async () => {
+    if (!activeId || !hasStaff) { setStaff(null); return; }
+    try { setStaff(await api(activeId, 'GET', '/api/v1/auth/session', { mode: 'session' })); }
+    catch (e) { setStaff(null); if (e.code === 'staff_session_expired' || e.status === 401) refreshProfiles(); }
+  }, [activeId, hasStaff, refreshProfiles]);
+  useEffect(() => { refreshStaff(); }, [refreshStaff]);
+  const staffSignOut = useCallback(async () => {
+    if (!activeId) return;
+    await cdn.profiles.staffLogout(activeId);
+    setStaff(null); await refreshProfiles();
+  }, [activeId, refreshProfiles]);
 
   // Theme + accent
   useEffect(() => {
@@ -97,7 +115,9 @@ export function AppProvider({ children }) {
     settings, setSettings, me, meError, scopes, hasScope,
     page, navigate, toast, toasts, dismissToast, confirm, prompt, dialog, closeDialog, copy,
     transfers, setTransfers, filesVersion, bumpFiles: () => setFilesVersion((v) => v + 1),
-  }), [profiles, activeId, active, refreshProfiles, setActive, settings, setSettings, me, meError, scopes, hasScope, page, navigate, toast, toasts, dismissToast, confirm, prompt, dialog, closeDialog, copy, transfers, filesVersion]);
+    serverEditor, editServer: setServerEditor,
+    staff, hasStaff, refreshStaff, staffSignOut, loginOpen, openLogin: setLoginOpen,
+  }), [serverEditor, staff, hasStaff, refreshStaff, staffSignOut, loginOpen, profiles, activeId, active, refreshProfiles, setActive, settings, setSettings, me, meError, scopes, hasScope, page, navigate, toast, toasts, dismissToast, confirm, prompt, dialog, closeDialog, copy, transfers, filesVersion]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

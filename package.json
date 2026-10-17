@@ -1,9 +1,11 @@
 {
   "name": "cdn-desktop",
   "productName": "CDN Desktop",
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "private": true,
   "description": "Desktop client for self-hosted CDN Platform servers",
   "author": "dvsprism",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "https://github.com/BallisticOK/CDN-Desktop.git"
@@ -40,12 +42,14 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "artifactName": "${productName}-Setup-${version}.${ext}"
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "license": "LICENSE"
     },
     "artifactName": "${productName}-${version}-${arch}.${ext}",
     "portable": {
       "artifactName": "${productName}-${version}-portable.${ext}"
-    }
+    },
+    "copyright": "Copyright (c) 2026 BallisticOK (0x00sec). All rights reserved."
   },
   "dependencies": {
     "@codemirror/language": "^6.13.1",

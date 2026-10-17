@@ -17,6 +17,18 @@ concurrency:
 jobs:
   windows:
     runs-on: windows-latest
+    env:
+      # Option A: a code-signing certificate (.pfx), stored base64-encoded.
+      WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+      WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+      # Option B: Azure Trusted Signing.
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      AZURE_SIGNING_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+      AZURE_SIGNING_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
+      AZURE_SIGNING_PROFILE: ${{ vars.AZURE_SIGNING_PROFILE }}
+      AZURE_PUBLISHER_NAME: ${{ vars.AZURE_PUBLISHER_NAME }}
     steps:
       - uses: actions/checkout@v4
 
@@ -36,10 +48,32 @@ jobs:
       - name: Build renderer
         run: npm run build
 
-      - name: Package Windows installer + portable exe
-        run: npx electron-builder --win --publish never
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: false
+      - name: Package (signed when a certificate is configured)
+        shell: bash
+        run: |
+          ARGS="--win --publish never"
+          if [ -n "$AZURE_CLIENT_ID" ] && [ -n "$AZURE_SIGNING_ENDPOINT" ]; then
+            echo "::notice::Signing with Azure Trusted Signing"
+            ARGS="$ARGS -c.win.azureSignOptions.endpoint=$AZURE_SIGNING_ENDPOINT -c.win.azureSignOptions.codeSigningAccountName=$AZURE_SIGNING_ACCOUNT -c.win.azureSignOptions.certificateProfileName=$AZURE_SIGNING_PROFILE -c.win.azureSignOptions.publisherName=\"$AZURE_PUBLISHER_NAME\""
+          elif [ -n "$WIN_CSC_LINK" ]; then
+            echo "::notice::Signing with the code-signing certificate from WIN_CSC_LINK"
+            export CSC_LINK="$WIN_CSC_LINK"
+            export CSC_KEY_PASSWORD="$WIN_CSC_KEY_PASSWORD"
+          else
+            echo "::warning::No signing certificate configured - building UNSIGNED. See README > Code signing."
+            export CSC_IDENTITY_AUTO_DISCOVERY=false
+          fi
+          eval npx electron-builder $ARGS
+
+      - name: Verify signature
+        if: env.WIN_CSC_LINK != '' || env.AZURE_CLIENT_ID != ''
+        shell: pwsh
+        run: |
+          Get-ChildItem installer\*.exe | ForEach-Object {
+            $sig = Get-AuthenticodeSignature $_.FullName
+            "{0}: {1} ({2})" -f $_.Name, $sig.Status, $sig.SignerCertificate.Subject
+            if ($sig.Status -ne 'Valid') { throw "Signature check failed for $($_.Name)" }
+          }
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

@@ -12,18 +12,26 @@ export default function Dashboard() {
   const analytics = useApi((pid) => api(pid, 'GET', '/api/v1/analytics', { query: { period } }), [period]);
   const storage = useApi((pid) => api(pid, 'GET', '/api/v1/storage'));
   const bw = useApi((pid) => api(pid, 'GET', '/api/v1/analytics/bandwidth', { query: { period } }), [period]);
+  const usage = useApi((pid) => api(pid, 'GET', '/api/v1/usage', { query: { scope_type: 'global' } }));
   const recent = useApi((pid) => api(pid, 'GET', '/api/v1/files', { query: { limit: 8, sort: 'created_at', order: 'desc' } }), [filesVersion]);
 
   const t = analytics.data?.totals || {};
   const series = analytics.data?.series || [];
   const st = storage.data || {};
-  const used = st.used_bytes ?? st.used ?? st.total_size ?? st.total_bytes ?? st.storage_used;
+  const u = usage.data?.usage || {};
+  const used = st.used_bytes ?? st.used ?? st.total_size ?? st.total_bytes ?? st.storage_used ?? u.storage_bytes;
   const available = st.available_bytes ?? st.available ?? st.capacity_bytes;
   const fileCount = st.file_count ?? st.files ?? st.total_files ?? recent.data?.pagination?.total;
-  const typeDist = normaliseDist(st.type_distribution || st.types || st.by_type);
+  let typeDist = normaliseDist(st.type_distribution || st.types || st.by_type);
+  let distTitle = 'Storage by type';
+  // API keys can't read /storage; fall back to per-provider usage from /usage.
+  if (!typeDist.length && usage.data?.cost?.lines?.length) {
+    typeDist = usage.data.cost.lines.map((l) => ({ label: l.provider?.name || l.provider?.kind || 'provider', value: l.storage_bytes || 0 })).sort((a, b) => b.value - a.value);
+    distTitle = 'Storage by provider';
+  }
   const who = me?.user?.name || me?.api_key?.name || 'there';
 
-  const reloadAll = () => { analytics.reload(); storage.reload(); bw.reload(); recent.reload(); };
+  const reloadAll = () => { analytics.reload(); storage.reload(); bw.reload(); recent.reload(); usage.reload(); };
 
   const pickUpload = async () => {
     const paths = await cdn.dialog.openFiles({ title: 'Upload files' });
@@ -43,7 +51,7 @@ export default function Dashboard() {
       </PageHeader>
 
       <div className="stats">
-        <Stat icon={HardDrive} label="Storage used" value={bytes(used)} sub={available ? `${bytes(available)} available` : storage.error ? 'unavailable' : ' '} tone="accent" />
+        <Stat icon={HardDrive} label="Storage used" value={bytes(used)} sub={available ? `${bytes(available)} available` : u.upload_bytes !== undefined ? `${bytes(u.upload_bytes)} uploaded this month` : ' '} tone="accent" />
         <Stat icon={FilesIcon} label="Files" value={num(fileCount)} sub={st.average_size || st.avg_size ? `avg ${bytes(st.average_size || st.avg_size)}` : ' '} tone="cyan" />
         <Stat icon={Activity} label={`Requests · ${period}`} value={num(t.requests)} sub={t.errors !== undefined ? `${num(t.errors)} errors` : analytics.error ? 'needs analytics:read' : ' '} tone="green"
           spark={<Sparkline values={series.map((s) => s.requests || 0)} color="var(--green)" />} />
@@ -61,10 +69,10 @@ export default function Dashboard() {
             ]} />
           )}
         </Card>
-        <Card title="Storage by type" icon={HardDrive}>
-          {storage.loading ? <Loading /> : storage.error ? <ErrorState error={storage.error} compact /> : typeDist.length ? (
+        <Card title={distTitle} icon={HardDrive}>
+          {storage.loading || (storage.error && usage.loading) ? <Loading /> : typeDist.length ? (
             <Donut items={typeDist.slice(0, 6)} format={bytes} centerLabel="stored" />
-          ) : <div className="chart-empty small">No type breakdown reported</div>}
+          ) : storage.error ? <ErrorState error={storage.error} compact /> : <div className="chart-empty small">No breakdown reported</div>}
         </Card>
       </div>
 

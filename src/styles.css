@@ -589,3 +589,47 @@ select.input { appearance: auto; }
 .grid-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 6px 2px 10px; }
 .grid-label:first-child { margin-top: 0; }
 .ctx-check { color: var(--accent); }
+.staff-box { margin-top: 16px; padding: 14px; border-radius: var(--radius-sm); background: var(--bg-2); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; }
+.staff-box.muted { flex-direction: row; align-items: center; }
+.staff-box.highlight { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.text-accent { color: var(--accent); }
+
+/* Multi-select */
+.files-scroll { position: relative; }
+.sel-check { width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center; border: 1.5px solid var(--line-2); background: var(--glass); backdrop-filter: blur(6px); color: transparent; transition: 0.12s; flex: none; }
+.sel-check:hover { border-color: var(--accent); }
+.sel-check.on { background: var(--accent); border-color: var(--accent); color: white; }
+.tile .sel-check { position: absolute; top: 8px; left: 8px; opacity: 0; z-index: 2; }
+.folder-tile .sel-check { top: 6px; left: 6px; }
+.tile:hover .sel-check, .selecting .tile .sel-check, .tile .sel-check.on { opacity: 1; }
+.row-item .sel-check { opacity: 0.35; }
+.row-item:hover .sel-check, .selecting .row-item .sel-check, .sel-check.on, .sel-check.static { opacity: 1; }
+.folder-tile.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 8px 24px var(--accent-soft); background: var(--accent-softer); }
+.band { position: absolute; z-index: 5; border: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); border-radius: 4px; pointer-events: none; }
+
+/* Login system */
+.nav-item.locked { opacity: 0.6; }
+.account-chip { display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin-top: 6px; border-radius: var(--radius-sm); background: var(--bg-2); border: 1px solid var(--line); text-align: left; font-size: 12.5px; }
+.account-chip:hover { border-color: var(--line-2); background: var(--bg-3); }
+.account-chip.signin { color: var(--accent-strong); border-style: dashed; font-weight: 600; }
+:root[data-theme='light'] .account-chip.signin { color: var(--accent); }
+.avatar.sm { width: 26px; height: 26px; border-radius: 8px; font-size: 10.5px; }
+.avatar.xl { width: 64px; height: 64px; border-radius: 18px; font-size: 22px; }
+.account-hero { display: flex; align-items: center; gap: 16px; }
+.account-hero h2 { font-size: 19px; }
+.gate { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 70px 20px; max-width: 520px; margin: 0 auto; }
+.gate p { line-height: 1.6; margin: 0 0 8px; }
+.gate-icon { width: 64px; height: 64px; border-radius: 20px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+.login-modal .modal-body { padding: 28px 28px 22px; }
+.login-hero { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 20px; text-align: center; }
+.login-hero h2 { font-size: 19px; margin-top: 6px; }
+.login-form { display: flex; flex-direction: column; gap: 10px; }
+.login-field { display: flex; align-items: center; gap: 10px; height: 42px; padding: 0 12px; border-radius: var(--radius-sm); background: var(--bg-1); border: 1px solid var(--line-2); color: var(--text-3); }
+.login-field:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.login-field input { flex: 1; border: 0; outline: 0; background: none; color: var(--text); user-select: text; }
+.login-form .btn { height: 40px; }
+.login-code { height: 48px; font-size: 22px; letter-spacing: 0.3em; text-align: center; }
+.login-step { display: flex; align-items: center; gap: 8px; font-weight: 650; color: var(--accent); }
+.login-error { padding: 9px 12px; border-radius: var(--radius-sm); background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.25); color: var(--red); font-size: 12.5px; }
+.folder-tile .sel-check { left: auto; right: 8px; top: 50%; transform: translateY(-50%); }
+.folder-tile .tile-lock { right: 34px; }
