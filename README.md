@@ -444,6 +444,7 @@ CDN Desktop is licensed under the **Cache Networks and BallisticOK Source-Availa
 For licensing enquiries or exceptions, [open an issue](https://github.com/BallisticOK/CDN-Desktop/issues/new) or contact [BallisticOK](https://github.com/BallisticOK) or [cachenetworks](https://github.com/cachenetworks).
 
 See [LICENSE](LICENSE) for the complete binding terms.
+
 <div align="center">
 <br>
 <img src="docs/assets/icon.png" width="56" alt="CDN Desktop icon"><br>
