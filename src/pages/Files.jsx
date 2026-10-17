@@ -42,6 +42,8 @@ export default function Files({ params = {} }) {
   const [view, setView] = useState(settings.defaultView || 'grid');
   const [selected, setSelected] = useState(new Set(params.selectId ? [params.selectId] : []));
   const [anchor, setAnchor] = useState(null);
+  const [selectMode, setSelectModeState] = useState(false);
+  const setSelectMode = (on) => { setSelectModeState(on); if (!on) setSelected(new Set()); };
   const [detailsId, setDetailsId] = useState(params.selectId || null);
   const [preview, setPreview] = useState(null);
   const [editing, setEditing] = useState(null);
@@ -97,7 +99,7 @@ export default function Files({ params = {} }) {
   const selectedFolders = useMemo(() => folders.filter((f) => selected.has(f.id)), [folders, selected]);
   const allItems = useMemo(() => [...folders, ...files], [folders, files]);
   const allSelected = allItems.length > 0 && allItems.every((x) => selected.has(x.id));
-  const selectAll = () => setSelected(new Set(allItems.map((x) => x.id)));
+  const selectAll = () => { setSelectModeState(true); setSelected(new Set(allItems.map((x) => x.id))); };
   const detailsFile = files.find((f) => f.id === detailsId) || null;
 
   const replaceFile = (f) => setFiles((prev) => prev.map((x) => (x.id === f.id ? { ...x, ...f } : x)));
@@ -272,7 +274,7 @@ export default function Files({ params = {} }) {
   const fileMenu = (e, f) => {
     if (selected.has(f.id) && selectedFolders.length) return openMenu(e, bulkMenuItems());
     let list = selected.has(f.id) ? selectedFiles : [f];
-    if (!selected.has(f.id)) { setSelected(new Set([f.id])); setAnchor(f.id); }
+    if (selectMode && !selected.has(f.id)) { setSelected(new Set([f.id])); setAnchor(f.id); }
     const multi = list.length > 1;
     openMenu(e, [
       multi && { header: `${list.length} files selected` },
@@ -326,6 +328,7 @@ export default function Files({ params = {} }) {
       { label: 'Paste image from clipboard', icon: ClipboardPaste, onClick: pasteClipboard },
       { label: 'New folder', icon: FolderPlus, onClick: newFolder },
       { divider: true },
+      { label: selectMode ? 'Exit select mode' : 'Select mode', icon: CheckSquare, onClick: () => setSelectMode(!selectMode), shortcut: 'Esc' },
       { label: 'Select all', icon: CheckSquare, onClick: selectAll, shortcut: 'Ctrl+A' },
       { label: 'Refresh', icon: RefreshCw, onClick: () => load(), shortcut: 'F5' },
     ]);
@@ -334,6 +337,15 @@ export default function Files({ params = {} }) {
   // ---------------------------------------------------------------- selection
   const toggle = (id) => { const next = new Set(selected); next.has(id) ? next.delete(id) : next.add(id); setSelected(next); setAnchor(id); };
   const clickFile = (e, f) => {
+    const isFolder = folders.some((x) => x.id === f.id);
+    if (!selectMode && !e.ctrlKey && !e.shiftKey && !e.metaKey) {
+      // Normal mode: clicking navigates / opens instead of selecting (ignore the 2nd click of a double-click).
+      if (e.detail > 1) return;
+      if (isFolder) navigateTo(f.id); else openFile(files.find((x) => x.id === f.id) || f);
+      return;
+    }
+    if (!selectMode) setSelectModeState(true);
+    if (!e.ctrlKey && !e.shiftKey && !e.metaKey) { toggle(f.id); return; }
     if (e.shiftKey && anchor) {
       const a = allItems.findIndex((x) => x.id === anchor); const b = allItems.findIndex((x) => x.id === f.id);
       const [s, t] = a < b ? [a, b] : [b, a];
@@ -341,9 +353,9 @@ export default function Files({ params = {} }) {
       allItems.slice(s, t + 1).forEach((x) => next.add(x.id));
       setSelected(next);
     } else if (e.ctrlKey || e.metaKey) toggle(f.id);
-    else { setSelected(new Set([f.id])); setAnchor(f.id); if (detailsId && files.some((x) => x.id === f.id)) setDetailsId(f.id); }
+    else toggle(f.id);
   };
-  const checkbox = (id) => (
+  const checkbox = (id) => selectMode && (
     <button className={classNames('sel-check', selected.has(id) && 'on')} title="Select" onClick={(e) => { e.stopPropagation(); if (e.shiftKey) clickFile(e, { id }); else toggle(id); }} onDoubleClick={(e) => e.stopPropagation()}>
       <Check size={12} strokeWidth={3} />
     </button>
@@ -354,7 +366,7 @@ export default function Files({ params = {} }) {
   const [band, setBand] = useState(null);
   const bandMoved = useRef(false);
   const onBandStart = (e) => {
-    if (e.button !== 0 || e.target.closest('.tile, .row-item, button, input, a, .load-more')) return;
+    if (!selectMode || e.button !== 0 || e.target.closest('.tile, .row-item, button, input, a, .load-more')) return;
     const el = scrollRef.current; const r = el.getBoundingClientRect();
     const start = { x: e.clientX - r.left + el.scrollLeft, y: e.clientY - r.top + el.scrollTop };
     const base = e.ctrlKey || e.shiftKey ? new Set(selected) : new Set();
@@ -383,11 +395,11 @@ export default function Files({ params = {} }) {
       if (e.target?.closest?.('input, textarea, select, .cm-editor, .modal')) return;
       if (preview !== null || editing) return;
       if (e.key === 'a' && e.ctrlKey) { e.preventDefault(); selectAll(); }
-      else if (e.key === 'Escape') { setSelected(new Set()); setDetailsId(null); }
+      else if (e.key === 'Escape') { if (selectMode) setSelectMode(false); else setDetailsId(null); }
       else if (e.key === 'Delete' && selected.size) bulkDelete();
       else if (e.key === 'F2' && selectedFiles.length === 1) renameFile(selectedFiles[0]);
       else if (e.key === 'F5') { e.preventDefault(); load(); }
-      else if (e.key === 'Enter' && selectedFiles.length === 1) openFile(selectedFiles[0]);
+      else if (e.key === 'Enter' && selectMode && selectedFiles.length === 1) openFile(selectedFiles[0]);
       else if (e.key === ' ' && selectedFiles.length === 1) { e.preventDefault(); setDetailsId(detailsId ? null : selectedFiles[0].id); }
       else if (e.key === 'c' && e.ctrlKey && selectedFiles.length && !window.getSelection()?.toString()) { e.preventDefault(); copyLinks(app, selectedFiles); }
       else if (e.key === 'Backspace' && folder) navigateTo(folder.parent_id || null);
@@ -403,7 +415,7 @@ export default function Files({ params = {} }) {
 
   return (
     <div className={classNames('page files-page', detailsFile && 'with-drawer')} onDragEnter={onDragEnter} onDragLeave={onDragLeave} onDragOver={onDragOver} onDrop={(e) => onDrop(e)}>
-      <div className="files-main" onContextMenu={bgMenu} onClick={(e) => { if (bandMoved.current) { bandMoved.current = false; return; } if (!e.target?.closest?.('.tile, .row-item, .bulkbar, .toolbar, .filterbar')) setSelected(new Set()); }}>
+      <div className="files-main" onContextMenu={bgMenu} onClick={(e) => { if (bandMoved.current) { bandMoved.current = false; return; } if (!selectMode && !e.target?.closest?.('.tile, .row-item, .bulkbar, .toolbar, .filterbar')) setSelected(new Set()); }}>
         <div className="toolbar">
           <div className="crumbs">
             <button className={classNames('crumb', !folderId && !searching && 'current', dropFolder === 'root' && 'drop')} onClick={() => navigateTo(null)}
@@ -441,27 +453,30 @@ export default function Files({ params = {} }) {
           {searching && <Segmented value={scopeAll ? 'all' : 'here'} onChange={(v) => setScopeAll(v === 'all')} options={[{ value: 'all', label: 'Everywhere' }, { value: 'here', label: 'This folder' }]} />}
           <div className="grow" />
           <span className="muted small">{pagination ? `${num(files.length)} of ${num(pagination.total)} files` : ''}{folders.length ? ` · ${folders.length} folders` : ''}</span>
-          <Button size="sm" variant="ghost" icon={CheckSquare} onClick={() => (allSelected ? setSelected(new Set()) : selectAll())} title="Select all (Ctrl+A)">{allSelected ? 'Clear' : 'Select all'}</Button>
+          {selectMode && <Button size="sm" variant="ghost" onClick={() => (allSelected ? setSelected(new Set()) : selectAll())} title="Select all (Ctrl+A)">{allSelected ? 'Select none' : 'Select all'}</Button>}
+          <button className={classNames('mode-toggle', selectMode && 'on')} onClick={() => setSelectMode(!selectMode)} title="Select mode: pick multiple items for bulk actions (Esc to exit)">
+            <CheckSquare size={15} /><span>{selectMode ? 'Selecting' : 'Select'}</span><i className="mode-switch"><b /></i>
+          </button>
           <Button size="sm" variant="ghost" icon={RefreshCw} onClick={() => load()} title="Refresh (F5)" />
           <Segmented value={view} onChange={setView} options={[{ value: 'grid', icon: LayoutGrid, title: 'Grid' }, { value: 'list', icon: List, title: 'List' }]} />
         </div>
 
-        {selected.size > 0 && (
+        {selectMode && (
           <div className="bulkbar">
-            <b>{[selectedFiles.length && `${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''}`, selectedFolders.length && `${selectedFolders.length} folder${selectedFolders.length > 1 ? 's' : ''}`].filter(Boolean).join(' · ') || `${selected.size} selected`}</b>
+            <b>{!selected.size ? 'Click items to select them, or drag a box' : [selectedFiles.length && `${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''}`, selectedFolders.length && `${selectedFolders.length} folder${selectedFolders.length > 1 ? 's' : ''}`].filter(Boolean).join(' · ') || `${selected.size} selected`}</b>
             <Button size="sm" variant="ghost" icon={Download} disabled={!selectedFiles.length} onClick={() => downloadFiles(app, selectedFiles)}>Download</Button>
             <Button size="sm" variant="ghost" icon={Link2} disabled={!selectedFiles.length} onClick={() => copyLinks(app, selectedFiles)}>Copy links</Button>
-            <Button size="sm" variant="ghost" icon={FolderInput} onClick={bulkMove}>Move</Button>
-            <Dropdown trigger={<Button size="sm" variant="ghost" icon={Shield}>Visibility</Button>} items={VISIBILITIES.map((v) => ({ label: VIS_LABEL[v], onClick: () => bulkVisibility(v) }))} />
-            <Button size="sm" variant="ghost" icon={Zap} onClick={bulkPurge}>Purge</Button>
-            <Button size="sm" variant="ghost-danger" icon={Trash2} onClick={() => bulkDelete()}>Delete</Button>
+            <Button size="sm" variant="ghost" icon={FolderInput} disabled={!selected.size} onClick={bulkMove}>Move</Button>
+            <Dropdown trigger={<Button size="sm" variant="ghost" icon={Shield} disabled={!selected.size}>Visibility</Button>} items={VISIBILITIES.map((v) => ({ label: VIS_LABEL[v], onClick: () => bulkVisibility(v) }))} />
+            <Button size="sm" variant="ghost" icon={Zap} disabled={!selected.size} onClick={bulkPurge}>Purge</Button>
+            <Button size="sm" variant="ghost-danger" icon={Trash2} disabled={!selected.size} onClick={() => bulkDelete()}>Delete</Button>
             <div className="grow" />
-            {!allSelected && <Button size="sm" variant="ghost" onClick={selectAll}>Select all {allItems.length}</Button>}
-            <Button size="sm" variant="ghost" icon={X} onClick={() => setSelected(new Set())} />
+            {!allSelected && allItems.length > 0 && <Button size="sm" variant="ghost" onClick={selectAll}>Select all {allItems.length}</Button>}
+            <Button size="sm" variant="ghost" icon={X} onClick={() => setSelectMode(false)} title="Exit select mode (Esc)" />
           </div>
         )}
 
-        <div className={classNames('files-scroll', selected.size > 0 && 'selecting')} ref={scrollRef} onMouseDown={onBandStart}>
+        <div className={classNames('files-scroll', selectMode && 'selecting')} ref={scrollRef} onMouseDown={onBandStart}>
           {band && <div className="band" style={band} />}
           {loading ? <Loading label="Loading files…" /> : error ? <ErrorState error={error} onRetry={load} /> : empty ? (
             <Empty icon={searching ? Search : FolderOpen} title={searching ? 'No matches' : 'This folder is empty'}
@@ -474,7 +489,7 @@ export default function Files({ params = {} }) {
             <div className="tiles folder-tiles">
               {folders.map((fo) => (
                 <div key={fo.id} data-sel-id={fo.id} className={classNames('tile folder-tile', dropFolder === fo.id && 'drop', selected.has(fo.id) && 'selected')} draggable onDragStart={(e) => startFolderDrag(e, fo)}
-                  onClick={(e) => clickFile(e, fo)} onDoubleClick={() => navigateTo(fo.id)} onContextMenu={(e) => folderMenu(e, fo)}
+                  onClick={(e) => clickFile(e, fo)} onDoubleClick={() => selectMode && navigateTo(fo.id)} onContextMenu={(e) => folderMenu(e, fo)}
                   onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDropFolder(fo.id); }} onDragLeave={() => setDropFolder(null)} onDrop={(e) => onDrop(e, fo.id)}>
                   {checkbox(fo.id)}
                   <FileIcon folder size={44} />
@@ -487,7 +502,7 @@ export default function Files({ params = {} }) {
             <div className="tiles">
               {files.map((f) => (
                 <div key={f.id} data-sel-id={f.id} className={classNames('tile file-tile', selected.has(f.id) && 'selected')} draggable onDragStart={(e) => startDrag(e, f)}
-                  onClick={(e) => clickFile(e, f)} onDoubleClick={() => openFile(f)} onContextMenu={(e) => fileMenu(e, f)}>
+                  onClick={(e) => clickFile(e, f)} onDoubleClick={() => selectMode && openFile(f)} onContextMenu={(e) => fileMenu(e, f)}>
                   <div className="tile-cover">
                     <FileIcon file={f} thumb cover />
                     {checkbox(f.id)}
@@ -506,12 +521,12 @@ export default function Files({ params = {} }) {
             </>
           ) : (
             <table className="table files-table">
-              <thead><tr><th style={{ width: 36 }}><button className={classNames('sel-check', 'static', allSelected && 'on')} onClick={() => (allSelected ? setSelected(new Set()) : selectAll())} title="Select all"><Check size={12} strokeWidth={3} /></button></th><th style={{ width: '46%' }}>Name</th><th>Size</th><th>Visibility</th><th>Downloads</th><th>Added</th><th style={{ width: 40 }} /></tr></thead>
+              <thead><tr>{selectMode && <th style={{ width: 36 }}><button className={classNames('sel-check', 'static', allSelected && 'on')} onClick={() => (allSelected ? setSelected(new Set()) : selectAll())} title="Select all"><Check size={12} strokeWidth={3} /></button></th>}<th style={{ width: '46%' }}>Name</th><th>Size</th><th>Visibility</th><th>Downloads</th><th>Added</th><th style={{ width: 40 }} /></tr></thead>
               <tbody>
                 {folders.map((fo) => (
-                  <tr key={fo.id} data-sel-id={fo.id} className={classNames('row-item', dropFolder === fo.id && 'drop', selected.has(fo.id) && 'selected')} draggable onDragStart={(e) => startFolderDrag(e, fo)} onClick={(e) => clickFile(e, fo)} onDoubleClick={() => navigateTo(fo.id)} onContextMenu={(e) => folderMenu(e, fo)}
+                  <tr key={fo.id} data-sel-id={fo.id} className={classNames('row-item', dropFolder === fo.id && 'drop', selected.has(fo.id) && 'selected')} draggable onDragStart={(e) => startFolderDrag(e, fo)} onClick={(e) => clickFile(e, fo)} onDoubleClick={() => selectMode && navigateTo(fo.id)} onContextMenu={(e) => folderMenu(e, fo)}
                     onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDropFolder(fo.id); }} onDragLeave={() => setDropFolder(null)} onDrop={(e) => onDrop(e, fo.id)}>
-                    <td>{checkbox(fo.id)}</td>
+                    {selectMode && <td>{checkbox(fo.id)}</td>}
                     <td><div className="name-cell"><FileIcon folder size={30} /><span>{fo.name}</span></div></td>
                     <td className="muted">{num(fo.file_count || 0)} files</td>
                     <td>{fo.visibility && <Badge tone={visTone(fo.visibility)}>{VIS_LABEL[fo.visibility]}</Badge>}</td>
@@ -521,8 +536,8 @@ export default function Files({ params = {} }) {
                 ))}
                 {files.map((f) => (
                   <tr key={f.id} data-sel-id={f.id} className={classNames('row-item', selected.has(f.id) && 'selected')} draggable onDragStart={(e) => startDrag(e, f)}
-                    onClick={(e) => clickFile(e, f)} onDoubleClick={() => openFile(f)} onContextMenu={(e) => fileMenu(e, f)}>
-                    <td>{checkbox(f.id)}</td>
+                    onClick={(e) => clickFile(e, f)} onDoubleClick={() => selectMode && openFile(f)} onContextMenu={(e) => fileMenu(e, f)}>
+                    {selectMode && <td>{checkbox(f.id)}</td>}
                     <td><div className="name-cell"><FileIcon file={f} size={30} thumb /><span className="ellipsis" title={f.name}>{f.name}</span>{searching && <small className="muted">{f.folder_path || '/'}</small>}</div></td>
                     <td className="muted nowrap">{bytes(f.size)}</td>
                     <td><Badge tone={visTone(f.visibility)}>{VIS_LABEL[f.visibility] || f.visibility}</Badge></td>

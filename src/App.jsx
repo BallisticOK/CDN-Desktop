@@ -113,7 +113,7 @@ function TitleBar() {
 }
 
 function Sidebar({ onAddServer }) {
-  const { profiles, active, setActive, page, navigate, transfers, meError, hasStaff, staff, openLogin, staffSignOut } = useApp();
+  const { profiles, active, setActive, page, navigate, transfers, meError, hasStaff, staff, openLogin, staffSignOut, update } = useApp();
   const [menu, setMenu] = useState(null);
   const running = useMemo(() => Object.values(transfers).filter((t) => t.status === 'running' || t.status === 'queued'), [transfers]);
   const progress = running.length ? running.reduce((a, t) => a + (t.loaded || 0), 0) / Math.max(1, running.reduce((a, t) => a + (t.size || 0), 0)) : 0;
@@ -155,6 +155,12 @@ function Sidebar({ onAddServer }) {
         ))}
       </nav>
 
+      {update && ['available', 'downloading', 'ready'].includes(update.status) && (
+        <button className="update-pill" onClick={() => navigate('settings', { tab: 'updates' })}>
+          <Sparkles size={15} />
+          <span className="grow">{update.status === 'ready' ? `Restart to update to ${update.latest}` : update.status === 'downloading' ? `Downloading ${update.latest}… ${Math.round((update.progress || 0) * 100)}%` : `Update ${update.latest} available`}</span>
+        </button>
+      )}
       {running.length > 0 && (
         <button className="side-transfer" onClick={() => navigate('transfers')}>
           <div className="side-transfer-top"><Upload size={14} /><span className="grow">{running.length} transfer{running.length > 1 ? 's' : ''}</span><b>{Math.round(progress * 100)}%</b></div>

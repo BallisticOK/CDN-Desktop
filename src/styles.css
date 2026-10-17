@@ -633,3 +633,20 @@ select.input { appearance: auto; }
 .login-error { padding: 9px 12px; border-radius: var(--radius-sm); background: rgba(248, 113, 113, 0.1); border: 1px solid rgba(248, 113, 113, 0.25); color: var(--red); font-size: 12.5px; }
 .folder-tile .sel-check { left: auto; right: 8px; top: 50%; transform: translateY(-50%); }
 .folder-tile .tile-lock { right: 34px; }
+
+/* Updates */
+.update-pill { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border-radius: var(--radius-sm); margin-bottom: 4px; text-align: left; font-size: 12.5px; font-weight: 600; color: white; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #22d3ee)); box-shadow: 0 6px 20px var(--accent-soft); animation: fade 0.3s; }
+.update-pill:hover { filter: brightness(1.08); }
+.update-hero { display: flex; align-items: center; gap: 16px; }
+.update-hero .welcome-logo { flex: none; }
+.update-notes { max-height: 260px; overflow-y: auto; white-space: pre-wrap; font-size: 12.5px; line-height: 1.6; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--bg-2); border: 1px solid var(--line); user-select: text; }
+
+/* Select-mode toggle */
+.mode-toggle { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 6px 0 10px; border-radius: var(--radius-sm); border: 1px solid var(--line-2); background: var(--bg-2); color: var(--text-2); font-size: 12.5px; font-weight: 600; transition: 0.15s; }
+.mode-toggle:hover { color: var(--text); }
+.mode-toggle.on { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 50%, transparent); color: var(--text); }
+.mode-switch { width: 26px; height: 16px; border-radius: 99px; background: var(--bg-4); position: relative; transition: 0.15s; }
+.mode-switch b { position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: white; transition: transform 0.18s cubic-bezier(.3,1.4,.5,1); }
+.mode-toggle.on .mode-switch { background: var(--accent); }
+.mode-toggle.on .mode-switch b { transform: translateX(10px); }
+.files-scroll:not(.selecting) .tile, .files-scroll:not(.selecting) .row-item { cursor: pointer; }

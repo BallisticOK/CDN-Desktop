@@ -13,6 +13,7 @@ const https = require('https');
 const crypto = require('crypto');
 const { Readable } = require('stream');
 const { pipeline } = require('stream/promises');
+const updater = require('./updater.cjs');
 
 const isDev = !!process.env.VITE_DEV_SERVER_URL;
 const CONFIG_PATH = () => path.join(app.getPath('userData'), 'config.json');
@@ -43,6 +44,7 @@ const DEFAULT_SETTINGS = {
   quickUploadHotkey: 'CommandOrControl+Alt+U',
   quickUploadEnabled: true,
   notifications: true,
+  autoUpdateCheck: true,
   confirmDeletes: true,
   defaultView: 'grid',
   pageSize: 60,
@@ -536,6 +538,7 @@ function createTray() {
   const rebuild = () => tray.setContextMenu(Menu.buildFromTemplate([
     { label: 'Open CDN Desktop', click: () => { win.show(); win.focus(); } },
     { label: 'Quick upload clipboard', click: quickUpload },
+    { label: 'Check for updates', click: () => { win.show(); win.webContents.send('navigate', { name: 'settings', params: { tab: 'updates' } }); updater.check(); } },
     { type: 'separator' },
     { label: 'Active server', submenu: config.profiles.map((p) => ({ label: p.name, type: 'radio', checked: p.id === config.activeId, click: () => { config.activeId = p.id; saveConfig(); win.webContents.send('profiles:changed'); rebuild(); } })) },
     { type: 'separator' },
@@ -696,6 +699,12 @@ function registerIpc() {
   handle('clipboard:write', (text) => { clipboard.writeText(String(text)); return true; });
   handle('clipboard:image', () => { const img = clipboard.readImage(); return img.isEmpty() ? null : img.toPNG(); });
   handle('quick:upload', quickUpload);
+  handle('update:state', () => updater.getState());
+  handle('update:check', () => updater.check());
+  handle('update:download', () => updater.download());
+  handle('update:cancel', () => updater.cancel());
+  handle('update:install', () => updater.install(() => { quitting = true; app.quit(); }));
+  handle('update:releases', () => updater.openReleasePage());
   handle('app:info', () => ({ version: app.getVersion(), electron: process.versions.electron, userData: app.getPath('userData'), encryption: safeStorage.isEncryptionAvailable(), platform: process.platform }));
   handle('app:exportProfiles', async (includeKeys) => {
     const r = await dialog.showSaveDialog(win, { defaultPath: 'cdn-desktop-servers.json', filters: [{ name: 'JSON', extensions: ['json'] }] });
@@ -749,5 +758,13 @@ app.whenReady().then(() => {
   createWindow();
   createTray();
   registerHotkey();
+  let notifiedVersion = null;
+  updater.init((st) => {
+    if (win && !win.isDestroyed()) win.webContents.send('update:state', st);
+    if (st.status === 'available' && st.latest !== notifiedVersion) { notifiedVersion = st.latest; notify('Update available', `CDN Desktop ${st.latest} is ready to download.`); }
+  });
+  const autoCheck = () => { if (config.settings.autoUpdateCheck) updater.check({ silent: true }); };
+  setTimeout(autoCheck, 8000);
+  setInterval(autoCheck, 6 * 60 * 60 * 1000);
   nativeTheme.on('updated', () => { if (config.settings.theme === 'system' && win) { try { win.setTitleBarOverlay(themeColors()); } catch {} } });
 });

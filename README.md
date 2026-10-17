@@ -28,7 +28,8 @@ git push --follow-tags   # CI builds and publishes the GitHub release
 
 - **Multiple servers**: add each CDN (URL + API key) in Settings → Servers or from the sidebar picker, and switch with `Ctrl+1…9`. Keys are encrypted with Windows DPAPI. You can import and export your server list.
 - **Staff sign-in**: optionally sign in with your CDN dashboard account (email, password, 2FA) for each server. This unlocks what API keys can't do: storage stats, API keys, webhooks, **Users**, **Audit log**, **Security** and **My account** (sessions, password). Only the session is kept, encrypted; the password is never stored.
-- **Multi-select everywhere**: checkboxes on every file and folder, drag a box to select, `Ctrl`/`Shift`-click, `Ctrl+A`. Bulk download, copy links, move, visibility, purge and delete across files *and* folders. Bulk actions also on share links, users and the recycle bin.
+- **Multi-select**: turn on **Select** mode in Files (or press Ctrl+A / Ctrl-click). Normally a click just opens folders and files. In select mode you get checkboxes, drag-a-box selection, `Ctrl`/`Shift`-click, `Ctrl+A`. Bulk download, copy links, move, visibility, purge and delete across files *and* folders. Bulk actions also on share links, users and the recycle bin.
+- **Auto-update**: checks GitHub Releases on startup and every 6 hours (Settings → Updates). It detects how it was installed: the installed version updates through the installer silently, and the portable exe downloads the new portable build and replaces itself. Downloads are checked against their SHA-256 checksum.
 - **Files**:
   - Grid or list view, folders, breadcrumbs, search (by name, ID or SHA-256), filters and sorting.
   - Multi-select (`Ctrl`/`Shift`-click), drag-and-drop to move.
@@ -78,4 +79,4 @@ The workflow verifies the signature after building and fails if it is invalid.
 
 ## License
 
-Proprietary, all rights reserved. No one may use, copy, modify or distribute this software without explicit written permission from the owner. See [LICENSE](LICENSE).
+**Source-available, not open source.** You can read the code and run the official release builds for personal use. Using the code in any way (copying, forking to build on, modifying, redistributing, commercial use) needs written permission from the owner first: just [open an issue](https://github.com/BallisticOK/CDN-Desktop/issues) and ask. See [LICENSE](LICENSE).

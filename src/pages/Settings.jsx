@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
   Settings as SettingsIcon, Server, Palette, Link2, Download, Keyboard, Info, Plus, Pencil, Check, ArrowUp, ArrowDown, Upload as UploadIcon,
-  FileDown, FileUp, PlugZap, CheckCircle2, XCircle, FolderOpen, Moon, Sun, Monitor, Shield,
+  FileDown, FileUp, PlugZap, CheckCircle2, XCircle, FolderOpen, Moon, Sun, Monitor, Shield, RefreshCw, DownloadCloud, ExternalLink, Rocket,
 } from 'lucide-react';
 import { useApp } from '../lib/store.jsx';
 import { cdn, ACCENTS, classNames, initials } from '../lib/util.js';
-import { PageHeader, Button, Card, Field, Toggle, Select, Segmented, Badge, Spinner } from '../components/ui.jsx';
+import { PageHeader, Button, Card, Field, Toggle, Select, Segmented, Badge, Spinner, Progress } from '../components/ui.jsx';
 import ServerEditor from '../components/ServerEditor.jsx';
 
 const TABS = [
@@ -14,6 +14,7 @@ const TABS = [
   { value: 'links', label: 'Links & sharing', icon: Link2 },
   { value: 'downloads', label: 'Downloads', icon: Download },
   { value: 'quick', label: 'Quick upload', icon: Keyboard },
+  { value: 'updates', label: 'Updates', icon: RefreshCw },
   { value: 'about', label: 'About', icon: Info },
 ];
 
@@ -34,6 +35,7 @@ export default function Settings({ params = {} }) {
           {tab === 'links' && <Links />}
           {tab === 'downloads' && <Downloads />}
           {tab === 'quick' && <QuickUpload />}
+          {tab === 'updates' && <Updates />}
           {tab === 'about' && <About />}
         </div>
       </div>
@@ -226,6 +228,46 @@ function QuickUpload() {
   );
 }
 const pretty = (a = '') => a.replace('CommandOrControl', 'Ctrl').split('+').join(' + ');
+
+function Updates() {
+  const { update, settings, setSettings, toast } = useApp();
+  const u = update || {};
+  const [busy, setBusy] = useState(false);
+  const run = async (fn) => { setBusy(true); try { await fn(); } catch (e) { toast(e.message, 'error'); } setBusy(false); };
+  const typeLabel = { installed: 'Installed (setup)', portable: 'Portable exe', dev: 'Running from source' }[u.installType] || '—';
+  const statusText = {
+    idle: 'Not checked yet', checking: 'Checking GitHub for updates…', 'up-to-date': 'You’re on the latest version.',
+    available: `Version ${u.latest} is available.`, downloading: `Downloading ${u.latest}…`, ready: `Version ${u.latest} is downloaded and ready to install.`,
+    installing: 'Installing… the app will restart.', error: `Update check failed: ${u.error}`,
+  }[u.status] || '';
+  return (
+    <Card>
+      <div className="stack">
+        <div className="update-hero">
+          <div className="welcome-logo sm"><Rocket size={22} /></div>
+          <div className="grow">
+            <b>CDN Desktop {u.current}</b> <Badge tone="neutral">{typeLabel}</Badge>
+            <div className={u.status === 'error' ? 'text-red small' : 'muted small'}>{statusText}{u.checkedAt && u.status !== 'checking' ? ` · checked ${new Date(u.checkedAt).toLocaleTimeString()}` : ''}</div>
+          </div>
+          {u.status === 'available' && <Button variant="primary" icon={DownloadCloud} loading={busy} onClick={() => run(() => cdn.updates.download())}>Download {u.asset ? `(${Math.round(u.asset.size / 1e6)} MB)` : ''}</Button>}
+          {u.status === 'downloading' && <Button onClick={() => cdn.updates.cancel()}>Cancel</Button>}
+          {u.status === 'ready' && <Button variant="primary" icon={Rocket} onClick={() => run(() => cdn.updates.install())}>Restart &amp; update</Button>}
+          {['idle', 'up-to-date', 'error'].includes(u.status || 'idle') && <Button icon={RefreshCw} loading={u.status === 'checking'} onClick={() => run(() => cdn.updates.check())}>Check now</Button>}
+        </div>
+        {u.status === 'downloading' && <Progress value={u.progress || 0} />}
+        {u.installType === 'portable' && <div className="banner banner-info"><Shield size={16} /><span>Portable copy detected: updating downloads the new portable exe and replaces this file in place, then reopens it.</span></div>}
+        {u.installType === 'installed' && <div className="banner banner-info"><Shield size={16} /><span>Installed copy detected: updating runs the new installer silently in your existing install folder and restarts the app. Your servers and settings are kept.</span></div>}
+        {u.installType === 'dev' && <div className="banner banner-warn"><Shield size={16} /><span>Running from source. Self-update is disabled; use <span className="mono">git pull</span>.</span></div>}
+        {u.latest && u.notes && ['available', 'downloading', 'ready'].includes(u.status) && <>
+          <div className="section-title">What’s new in {u.latest}</div>
+          <div className="update-notes">{u.notes}</div>
+        </>}
+        <Field label="Check for updates automatically" row hint="On startup and every 6 hours. You are always asked before anything is downloaded."><Toggle checked={settings.autoUpdateCheck !== false} onChange={(v) => setSettings({ autoUpdateCheck: v })} /></Field>
+        <div><Button variant="ghost" size="sm" icon={ExternalLink} onClick={() => cdn.updates.releases()}>View all releases on GitHub</Button></div>
+      </div>
+    </Card>
+  );
+}
 
 function About() {
   const [info, setInfo] = useState(null);

@@ -18,6 +18,7 @@ export function AppProvider({ children }) {
   const [serverEditor, setServerEditor] = useState(null);
   const [staff, setStaff] = useState(null);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [update, setUpdate] = useState(null);
   const toastId = useRef(0);
 
   const refreshProfiles = useCallback(async () => {
@@ -29,11 +30,14 @@ export function AppProvider({ children }) {
   useEffect(() => {
     refreshProfiles();
     cdn.settings.get().then(setSettingsState);
+    cdn.updates.state().then(setUpdate).catch(() => {});
     cdn.transfers.list().then((list) => setTransfers(Object.fromEntries(list.map((t) => [t.id, t]))));
     const offs = [
       cdn.on('transfer:event', (t) => setTransfers((prev) => ({ ...prev, [t.id]: t }))),
       cdn.on('profiles:changed', () => refreshProfiles()),
       cdn.on('files:changed', () => setFilesVersion((v) => v + 1)),
+      cdn.on('update:state', setUpdate),
+      cdn.on('navigate', (p) => setPageState({ name: p.name, params: p.params || {} })),
     ];
     return () => offs.forEach((f) => f());
   }, [refreshProfiles]);
@@ -116,8 +120,8 @@ export function AppProvider({ children }) {
     page, navigate, toast, toasts, dismissToast, confirm, prompt, dialog, closeDialog, copy,
     transfers, setTransfers, filesVersion, bumpFiles: () => setFilesVersion((v) => v + 1),
     serverEditor, editServer: setServerEditor,
-    staff, hasStaff, refreshStaff, staffSignOut, loginOpen, openLogin: setLoginOpen,
-  }), [serverEditor, staff, hasStaff, refreshStaff, staffSignOut, loginOpen, profiles, activeId, active, refreshProfiles, setActive, settings, setSettings, me, meError, scopes, hasScope, page, navigate, toast, toasts, dismissToast, confirm, prompt, dialog, closeDialog, copy, transfers, filesVersion]);
+    staff, hasStaff, refreshStaff, staffSignOut, loginOpen, openLogin: setLoginOpen, update,
+  }), [update, serverEditor, staff, hasStaff, refreshStaff, staffSignOut, loginOpen, profiles, activeId, active, refreshProfiles, setActive, settings, setSettings, me, meError, scopes, hasScope, page, navigate, toast, toasts, dismissToast, confirm, prompt, dialog, closeDialog, copy, transfers, filesVersion]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

@@ -84,10 +84,16 @@ jobs:
             installer/*.blockmap
           if-no-files-found: error
 
+      - name: Write release notes from the commit message
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: git log -1 --format=%b "$GITHUB_SHA" | grep -v '^Co-Authored-By:' > release-notes.md
+
       - name: Publish GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
+          body_path: release-notes.md
           generate_release_notes: true
           files: |
             installer/*.exe

@@ -1,7 +1,7 @@
 {
   "name": "cdn-desktop",
   "productName": "CDN Desktop",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "Desktop client for self-hosted CDN Platform servers",
   "author": "dvsprism",

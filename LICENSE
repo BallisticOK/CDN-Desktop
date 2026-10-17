@@ -1,39 +1,48 @@
-CDN Desktop — Proprietary Software License
+CDN Desktop — Source-Available License (Permission Required)
 
 Copyright (c) 2026 BallisticOK (0x00sec). All rights reserved.
 
-1. Ownership
-   This software, including its source code, object code, binaries, build
-   scripts, designs, graphics, documentation and any related materials
-   (together, the "Software"), is the exclusive property of the copyright
-   holder named above (the "Owner"). The Software is licensed, not sold.
+The source code of CDN Desktop (the "Software") is published publicly so that
+anyone can read and review it. Being public does NOT make it open source.
 
-2. No permission without written consent
-   No person or entity is granted any right to use, run, install, copy,
-   reproduce, modify, adapt, translate, merge, publish, distribute,
-   sublicense, sell, rent, lease, lend, host, reverse engineer, decompile,
-   disassemble, or create derivative works of the Software, in whole or in
-   part, unless the Owner has given that specific person or entity prior,
-   explicit, written permission.
+1. What you MAY do without asking
+   a. View and read the source code on GitHub.
+   b. Download the official, unmodified release builds published by the Owner
+      at https://github.com/BallisticOK/CDN-Desktop/releases and run them for
+      your own personal, non-commercial use.
+   c. Open issues and suggest changes (pull requests) to the official
+      repository. By submitting a contribution you grant the Owner a
+      perpetual, irrevocable, royalty-free right to use, modify and
+      relicense it.
 
-   Any permission granted is personal, non-exclusive, non-transferable, and
-   limited to the exact scope stated in the Owner's written permission. It
-   may be revoked by the Owner at any time, after which all use must stop and
-   all copies in the recipient's possession must be destroyed.
+2. What REQUIRES the Owner's prior written permission
+   Anything else, including (without limitation):
+   a. Using any part of the source code in another project, product, service
+      or codebase, whether free or paid, public or private.
+   b. Copying, forking (beyond what GitHub's Terms of Service require for
+      viewing and contributing), modifying, translating or creating
+      derivative works.
+   c. Building, compiling or packaging your own copies of the Software.
+   d. Redistributing, re-uploading, mirroring, selling, sublicensing, renting
+      or hosting the Software or the official builds.
+   e. Removing or altering any copyright, license or attribution notice.
+   f. Any commercial use.
 
-3. Access is not permission
-   Being able to view, download or obtain a copy of the Software (for
-   example through a source code repository, release page or file share)
-   does not grant any licence or right of any kind.
+3. How to get permission
+   Ask the Owner, e.g. by opening an issue at
+   https://github.com/BallisticOK/CDN-Desktop/issues or contacting
+   https://github.com/BallisticOK. Permission only exists if the Owner grants
+   it explicitly, in writing, to you personally. Silence is not permission.
+   Any permission is limited to the scope stated, is non-transferable, and
+   may be revoked at any time.
 
-4. Confidentiality
-   The source code of the Software is confidential and a trade secret of the
-   Owner. Anyone who obtains access to it must keep it confidential and must
-   not disclose it to any third party without the Owner's written consent.
+4. Ownership
+   The Owner retains all right, title and interest in the Software. No rights
+   are granted except those expressly stated above.
 
 5. Third-party components
    The Software includes third-party open-source components that remain
-   subject to their own licences. This licence does not restrict rights
+   subject to their own licences. This license does not restrict rights
    granted by those licences for those components alone.
 
 6. No warranty
@@ -43,10 +52,7 @@ Copyright (c) 2026 BallisticOK (0x00sec). All rights reserved.
    THE OWNER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
 
-7. Termination and enforcement
-   Any use of the Software outside the terms above is unauthorised,
-   automatically terminates any permission previously granted, and may be
-   pursued under applicable copyright and trade-secret law.
-
-To request permission, contact the Owner through
-https://github.com/BallisticOK.
+7. Termination
+   Any use outside these terms is unauthorised, immediately terminates any
+   permission previously granted, and may be pursued under applicable
+   copyright law.
