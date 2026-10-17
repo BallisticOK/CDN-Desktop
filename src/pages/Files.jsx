@@ -335,7 +335,7 @@ export default function Files({ params = {} }) {
   };
 
   // ---------------------------------------------------------------- selection
-  const toggle = (id) => { const next = new Set(selected); next.has(id) ? next.delete(id) : next.add(id); setSelected(next); setAnchor(id); };
+  const toggle = (id) => { setSelected((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; }); setAnchor(id); };
   const clickFile = (e, f) => {
     const isFolder = folders.some((x) => x.id === f.id);
     if (!selectMode && !e.ctrlKey && !e.shiftKey && !e.metaKey) {

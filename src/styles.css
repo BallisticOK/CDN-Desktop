@@ -650,3 +650,6 @@ select.input { appearance: auto; }
 .mode-toggle.on .mode-switch { background: var(--accent); }
 .mode-toggle.on .mode-switch b { transform: translateX(10px); }
 .files-scroll:not(.selecting) .tile, .files-scroll:not(.selecting) .row-item { cursor: pointer; }
+.with-drawer .filterbar > .muted.small { display: none; }
+.with-drawer .filterbar { flex-wrap: nowrap; }
+.with-drawer .filterbar .select select { min-width: 0; }
