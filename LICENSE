@@ -1,58 +1,75 @@
-CDN Desktop — Source-Available License (Permission Required)
+CDN Desktop — Source-Available License (Written Permission Required)
 
-Copyright (c) 2026 BallisticOK (0x00sec). All rights reserved.
+Copyright (c) 2026 BallisticOK (https://github.com/BallisticOK) and
+cachenetworks (https://github.com/cachenetworks). All rights reserved.
 
-The source code of CDN Desktop (the "Software") is published publicly so that
-anyone can read and review it. Being public does NOT make it open source.
+The source code of CDN Desktop (the "Software") is owned jointly by
+BallisticOK and cachenetworks (together the "Owners", each an "Owner"). It is
+published publicly so that anyone can read and review it. Being public does
+NOT make it open source, and no open-source licence applies to it.
 
 1. What you MAY do without asking
    a. View and read the source code on GitHub.
-   b. Download the official, unmodified release builds published by the Owner
-      at https://github.com/BallisticOK/CDN-Desktop/releases and run them for
-      your own personal, non-commercial use.
+   b. Download the official, unmodified release builds published by the
+      Owners at https://github.com/BallisticOK/CDN-Desktop/releases and run
+      them for your own personal, non-commercial use.
    c. Open issues and suggest changes (pull requests) to the official
-      repository. By submitting a contribution you grant the Owner a
-      perpetual, irrevocable, royalty-free right to use, modify and
-      relicense it.
+      repository. By submitting a contribution you grant the Owners a
+      perpetual, irrevocable, worldwide, royalty-free right to use, modify
+      and relicense it.
 
-2. What REQUIRES the Owner's prior written permission
-   Anything else, including (without limitation):
-   a. Using any part of the source code in another project, product, service
-      or codebase, whether free or paid, public or private.
-   b. Copying, forking (beyond what GitHub's Terms of Service require for
-      viewing and contributing), modifying, translating or creating
-      derivative works.
-   c. Building, compiling or packaging your own copies of the Software.
-   d. Redistributing, re-uploading, mirroring, selling, sublicensing, renting
-      or hosting the Software or the official builds.
-   e. Removing or altering any copyright, license or attribution notice.
-   f. Any commercial use.
+2. What is PROHIBITED without written permission
+   Unless you hold written permission from at least one Owner, you may NOT:
+   a. Use any part of the source code, assets, design or documentation in
+      any other project, product, service or codebase, whether free or paid,
+      public or private, personal or commercial.
+   b. Copy the source code, in whole or in part, including copying snippets,
+      files, functions or substantial portions of its structure.
+   c. Fork the repository for your own use. A fork created only through
+      GitHub's interface, as GitHub's Terms of Service allow, may be used
+      solely to view the code and to submit pull requests to the official
+      repository. It may not be built, modified for your own purposes,
+      used, redistributed or kept as the basis of another project.
+   d. Modify, translate, adapt or create derivative works of the Software.
+   e. Build, compile or package your own copies of the Software.
+   f. Redistribute, re-upload, mirror, sell, sublicense, rent or host the
+      Software, its source code or the official builds.
+   g. Remove or alter any copyright, licence or attribution notice.
+   h. Use the Software or its code for any commercial purpose.
 
 3. How to get permission
-   Ask the Owner, e.g. by opening an issue at
-   https://github.com/BallisticOK/CDN-Desktop/issues or contacting
-   https://github.com/BallisticOK. Permission only exists if the Owner grants
-   it explicitly, in writing, to you personally. Silence is not permission.
-   Any permission is limited to the scope stated, is non-transferable, and
-   may be revoked at any time.
+   Ask either Owner, for example by opening an issue at
+   https://github.com/BallisticOK/CDN-Desktop/issues or by contacting
+   https://github.com/BallisticOK or https://github.com/cachenetworks.
+   Permission exists only if an Owner grants it explicitly, in writing, to
+   you personally. Silence, inaction or the code being public is not
+   permission. Any permission is limited to the scope stated in writing, is
+   non-transferable, and may be revoked by either Owner at any time.
 
 4. Ownership
-   The Owner retains all right, title and interest in the Software. No rights
-   are granted except those expressly stated above.
+   The Owners retain all right, title and interest in the Software. No
+   rights are granted except those expressly stated above. Either Owner may
+   enforce this licence on behalf of both.
 
-5. Third-party components
+5. Enforcement
+   Any use, copying, forking or distribution outside these terms is
+   copyright infringement. The Owners will act on it and may, without
+   further notice:
+   a. file DMCA or equivalent takedown notices against infringing copies,
+      repositories, packages and hosted builds;
+   b. take legal action and seek damages, legal costs, injunctions and any
+      other remedy available under applicable law.
+   Any permission previously granted to an infringing party terminates
+   immediately and automatically.
+
+6. Third-party components
    The Software includes third-party open-source components that remain
-   subject to their own licences. This license does not restrict rights
+   subject to their own licences. This licence does not restrict rights
    granted by those licences for those components alone.
 
-6. No warranty
+7. No warranty
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
    FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL
-   THE OWNER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
-
-7. Termination
-   Any use outside these terms is unauthorised, immediately terminates any
-   permission previously granted, and may be pursued under applicable
-   copyright law.
+   THE OWNERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING
+   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.

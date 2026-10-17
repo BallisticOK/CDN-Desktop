@@ -341,7 +341,7 @@ CDN-Desktop/
 ## 🛠 Building from source
 
 > [!IMPORTANT]
-> The code is **source-available, not open source**. Building your own copy requires the owner's permission (see [License](#-license)).
+> The code is **source-available, not open source**. Building your own copy requires written permission from the owners (see [License](#-license)).
 
 ```powershell
 git clone https://github.com/BallisticOK/CDN-Desktop.git
@@ -430,11 +430,12 @@ That's what it's built for: add each server with its own URL and key and switch 
 
 ## 📜 License
 
-**Source-available, not open source.** © 2026 BallisticOK (0x00sec). All rights reserved.
+**Source-available, not open source.** © 2026 [BallisticOK](https://github.com/BallisticOK) & [cachenetworks](https://github.com/cachenetworks). All rights reserved.
 
 - ✅ You **may** read the code and run the official release builds for personal use.
-- ❌ You **may not** copy, fork to build on, modify, redistribute, rebuild or use the code commercially **without written permission**.
-- 🙋 Want to use it? [**Open an issue and ask**](https://github.com/BallisticOK/CDN-Desktop/issues/new).
+- ❌ Without **written permission from one or both owners** you **may not** use, copy or fork the code for your own use, modify it, rebuild it, redistribute it or use it commercially.
+- ⚖️ Unauthorised use is copyright infringement and will be met with takedowns and legal action.
+- 🙋 Want to use it? [**Open an issue and ask**](https://github.com/BallisticOK/CDN-Desktop/issues/new) or contact [BallisticOK](https://github.com/BallisticOK) or [cachenetworks](https://github.com/cachenetworks).
 
 See [LICENSE](LICENSE) for the full terms.
 

@@ -49,7 +49,7 @@
     "portable": {
       "artifactName": "${productName}-${version}-portable.${ext}"
     },
-    "copyright": "Copyright (c) 2026 BallisticOK (0x00sec). All rights reserved."
+    "copyright": "Copyright (c) 2026 BallisticOK and cachenetworks. All rights reserved."
   },
   "dependencies": {
     "@codemirror/language": "^6.13.1",
