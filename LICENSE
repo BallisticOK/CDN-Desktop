@@ -28,8 +28,11 @@ and agree to comply with this License.
 1.1 "Owners" means Cache Networks (https://github.com/cachenetworks)
 and BallisticOK (https://github.com/BallisticOK), the joint copyright
 holders who publish CDN Desktop, together with their lawful successors.
-Each copyright holder is an "Owner". Either Owner may give written permission
-under this License unless applicable law requires both Owners to consent.
+Each copyright holder is an "Owner". In this License, permissions or
+exceptions requiring approval from the "Owners" require express written
+consent from BOTH Owners or from a representative expressly authorised in
+writing by both Owners. A request sent to only one Owner, or consent from
+only one Owner, does not satisfy that requirement.
 
 1.2 "CDN Desktop" means the software project distributed from the official
 repository currently located at:
@@ -177,7 +180,7 @@ b. retain this LICENSE file in full;
 c. retain existing copyright and attribution notices;
 d. clearly state that it is an unofficial development fork if there is any
    reasonable possibility of confusion;
-e. avoid branding that suggests endorsement or official status unless either Owner has given written permission;
+e. avoid branding that suggests endorsement or official status unless both Owners have given written permission;
 f. be used primarily for contribution, review, testing, discussion, or related
    community-development purposes; and
 g. comply with every other restriction in this License.
@@ -259,7 +262,7 @@ in any release.
 -------------------------------------------------------------------------------
 
 6.1 If You copy or adapt a Covered Excerpt into another project under any
-permission granted by either Owner, You must preserve attribution.
+permission granted by both Owners, You must preserve attribution.
 
 6.2 At minimum, the relevant source file or an accompanying attribution file
 must contain a notice substantially equivalent to:
@@ -292,7 +295,7 @@ does not protect as the Owners' copyright.
 -------------------------------------------------------------------------------
 
 Except for Community Fork activity expressly permitted by Section 4, or
-separate written permission from either Owner, You may not Redistribute the
+separate written permission from both Owners, You may not Redistribute the
 Software.
 
 Without limitation, You may not:
@@ -319,7 +322,7 @@ p. use a Community Fork as a disguised independent distribution.
 8. NO COMMERCIAL USE WITHOUT WRITTEN PERMISSION
 -------------------------------------------------------------------------------
 
-8.1 Commercial Use is prohibited unless either Owner gives prior written
+8.1 Commercial Use is prohibited unless both Owners give prior written
 permission or provides a separate commercial license.
 
 8.2 Prohibited Commercial Use includes, without limitation:
@@ -346,7 +349,7 @@ permitted Personal Use into Commercial Use.
 9. NO ORGANISATIONAL USE WITHOUT WRITTEN PERMISSION
 -------------------------------------------------------------------------------
 
-9.1 Organisational Use is prohibited unless either Owner gives prior written
+9.1 Organisational Use is prohibited unless both Owners give prior written
 permission or provides a separate license.
 
 9.2 Examples include deployment by or for:
@@ -383,7 +386,7 @@ service to third parties.
 
 10.3 You may not offer CDN Desktop, a Modification, or a substantially
 similar Derivative Work as a Hosted Service for third parties without
-written permission from either Owner.
+written permission from both Owners.
 
 10.4 Prohibited Hosted Service activity includes offering third-party
 accounts, remote access to the Software, white-label CDN management,
@@ -542,7 +545,7 @@ this License.
 19.1 You must retain this License with every permitted copy where reasonably
 practicable.
 
-19.2 You must not remove copyright headers or notices from files unless either Owner has expressly authorised their removal.
+19.2 You must not remove copyright headers or notices from files unless both Owners have expressly authorised their removal.
 
 19.3 You must not add false authorship or ownership claims to the Owners
 material.
@@ -576,9 +579,9 @@ the rights of another person.
 -------------------------------------------------------------------------------
 
 22.1 Uses not expressly permitted by this License require prior written
-permission from either Owner.
+permission from both Owners.
 
-22.2 Either Owner may, at their sole discretion, grant:
+22.2 The Owners may jointly, at their discretion, grant:
 
 a. commercial licenses;
 b. organisational-use licenses;
@@ -712,7 +715,7 @@ as a waiver of that or any other right or remedy.
 31.1 This License states the default permissions granted by the Owners for
 the Software.
 
-31.2 If either Owner gives You a separate written license or permission that
+31.2 If both Owners give You a separate written license or permission that
 expressly conflicts with this License, the separate written terms control for
 that expressly authorised use.
 
@@ -790,4 +793,4 @@ pull requests.
 
 If You want to redistribute it, commercialise it, host it for third parties,
 rebrand it, incorporate protected code into another distributed project, or
-obtain broader rights, You must first obtain permission from either Owner.
+obtain broader rights, You must first obtain permission from both Owners.
