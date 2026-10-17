@@ -437,9 +437,9 @@ CDN Desktop is licensed under the **Cache Networks and BallisticOK Source-Availa
 - ✅ **Personal use:** view, download, run, privately build and privately modify the app for non-commercial use.
 - ✅ **Community contributions:** fork on GitHub for genuine development, testing, bug fixes and pull requests back to CDN Desktop, subject to the license conditions.
 - ✅ **Attribution:** keep the LICENSE file and existing notices in permitted copies and contribution forks.
-- ❌ **No independent distribution:** do not publish your own releases, installers, packages, mirrors or rebranded versions without written permission from an Owner.
-- ❌ **No commercial or organisational use:** a separate written licence or permission is required.
-- ❌ **No copying protected code into another distributed project** without permission; attribution alone is not permission.
+- ❌ **No independent distribution:** do not publish your own releases, installers, packages, mirrors or rebranded versions without written permission from both copyright holders.
+- ❌ **No commercial or organisational use:** written permission from both copyright holders or a separate jointly approved licence is required.
+- ❌ **No copying protected code into another distributed project** without joint written permission; attribution alone is not permission.
 
 For licensing enquiries or exceptions, [open an issue](https://github.com/BallisticOK/CDN-Desktop/issues/new) or contact [BallisticOK](https://github.com/BallisticOK) or [cachenetworks](https://github.com/cachenetworks).
 
